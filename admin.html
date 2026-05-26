@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LS Check — Painel Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+      :root {
+        --blue-dark: #052288;
+        --blue-vivid: #0453cc;
+        --blue-hover: #0349b3;
+        --blue-light: #dbeafe;
+        --blue-tint: #eff6ff;
+        --gray-main: #2a2a29;
+        --gray-bg: #f6f6f6;
+        --gray-mid: #6b7280;
+        --white: #ffffff;
+        --border: #e5e7eb;
+        --green: #16a34a;
+        --green-bg: #dcfce7;
+        --yellow: #d97706;
+        --yellow-bg: #fef3c7;
+        --red: #dc2626;
+        --red-bg: #fee2e2;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+        --r-sm: 8px;
+        --r-md: 12px;
+        --font: "DM Sans", sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        font-size: 16px;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--gray-bg);
+        color: var(--gray-main);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+      button {
+        font-family: var(--font);
+        cursor: pointer;
+        border: none;
+        outline: none;
+      }
+      input,
+      select {
+        font-family: var(--font);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* HEADER */
+      #header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: var(--blue-dark);
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        box-shadow: 0 2px 12px rgba(5, 34, 136, 0.3);
+      }
+      .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-svg {
+        width: 44px;
+        height: 44px;
+      }
+      .header-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: -0.3px;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .header-actions button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--r-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s;
+      }
+      .header-actions button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* MAIN */
+      #app {
+        padding-top: 60px;
+      }
+      .content-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+
+      /* METRICS */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .metric-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 18px 20px;
+        box-shadow: var(--shadow-sm);
+      }
+      .metric-label {
+        font-size: 0.78rem;
+        color: var(--gray-mid);
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .metric-value {
+        font-size: 1.9rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .metric-value.green {
+        color: var(--green);
+      }
+      .metric-value.yellow {
+        color: var(--yellow);
+      }
+      .metric-value.black {
+        color: var(--gray-main);
+      }
+
+      /* TABS */
+      .tabs-bar {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 6px;
+        display: flex;
+        gap: 4px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+      }
+      .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: 2px solid transparent;
+        border-radius: var(--r-sm);
+        padding: 9px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--gray-mid);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        background: var(--blue-tint);
+        color: var(--blue-vivid);
+      }
+      .tab-btn.active {
+        border-color: var(--blue-vivid);
+        background: var(--blue-tint);
+        color: var(--blue-vivid);
+      }
+      .tab-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* TAB PANELS */
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* TOOLBAR */
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+      }
+      .search-wrap svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-mid);
+        width: 15px;
+        height: 15px;
+      }
+      .search-wrap input {
+        width: 100%;
+        padding: 9px 12px 9px 34px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        background: var(--white);
+        font-size: 0.85rem;
+        color: var(--gray-main);
+        transition: border-color 0.15s;
+      }
+      .search-wrap input:focus {
+        outline: none;
+        border-color: var(--blue-vivid);
+      }
+      .filter-select {
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        background: var(--white);
+        font-size: 0.85rem;
+        color: var(--gray-main);
+        cursor: pointer;
+      }
+      .filter-select:focus {
+        outline: none;
+        border-color: var(--blue-vivid);
+      }
+      .date-input {
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        background: var(--white);
+        font-size: 0.85rem;
+        color: var(--gray-main);
+      }
+      .date-input:focus {
+        outline: none;
+        border-color: var(--blue-vivid);
+      }
+      .btn-primary {
+        background: var(--blue-vivid);
+        color: #fff;
+        padding: 9px 16px;
+        border-radius: var(--r-sm);
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.15s;
+        white-space: nowrap;
+      }
+      .btn-primary:hover {
+        background: var(--blue-hover);
+      }
+      .btn-primary svg {
+        width: 14px;
+        height: 14px;
+      }
+      .btn-secondary {
+        background: var(--white);
+        color: var(--gray-main);
+        padding: 9px 14px;
+        border-radius: var(--r-sm);
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s;
+      }
+      .btn-secondary:hover {
+        border-color: var(--blue-vivid);
+        color: var(--blue-vivid);
+      }
+
+      /* CARDS LIST */
+      .list-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.15s;
+      }
+      .list-card:hover {
+        box-shadow: var(--shadow-md);
+      }
+      .card-icon-wrap {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--blue-tint);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .card-icon-wrap svg {
+        width: 16px;
+        height: 16px;
+        color: var(--blue-vivid);
+      }
+      .card-icon-wrap.green-icon {
+        background: var(--green-bg);
+      }
+      .card-icon-wrap.green-icon svg {
+        color: var(--green);
+      }
+      .card-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .card-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 3px;
+      }
+      .card-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--gray-main);
+      }
+      .card-sub {
+        font-size: 0.78rem;
+        color: var(--gray-mid);
+      }
+      .card-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .card-date {
+        font-size: 0.78rem;
+        color: var(--gray-mid);
+        white-space: nowrap;
+      }
+      .action-btns {
+        display: flex;
+        gap: 6px;
+      }
+      .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: var(--r-sm);
+        background: var(--gray-bg);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s;
+        color: var(--gray-mid);
+      }
+      .action-btn:hover {
+        background: var(--blue-tint);
+        color: var(--blue-vivid);
+        border-color: var(--blue-vivid);
+      }
+      .action-btn.danger:hover {
+        background: var(--red-bg);
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .action-btn svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      /* BADGES */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 9px;
+        border-radius: 99px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+      .badge-blue {
+        background: var(--blue-vivid);
+        color: #fff;
+      }
+      .badge-yellow {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+      }
+      .badge-red {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+      .badge-green {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+      .badge-gray {
+        background: var(--gray-bg);
+        color: var(--gray-mid);
+        border: 1px solid var(--border);
+      }
+
+      /* SECTION HEADER */
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        margin-top: 24px;
+      }
+      .section-header:first-child {
+        margin-top: 0;
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .section-title svg {
+        width: 18px;
+        height: 18px;
+        color: var(--blue-vivid);
+      }
+
+      /* FATURAMENTO */
+      .fat-layout {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 16px;
+      }
+      .fat-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .fat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .fat-client {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .fat-client:hover {
+        border-color: var(--blue-vivid);
+      }
+      .fat-client.selected {
+        border-color: var(--blue-vivid);
+        background: var(--blue-tint);
+      }
+      .fat-client .ci {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--blue-tint);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .fat-client .ci svg {
+        width: 15px;
+        height: 15px;
+        color: var(--blue-vivid);
+      }
+      .fat-client .cname {
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .fat-client .cprice {
+        font-size: 0.75rem;
+        color: var(--gray-mid);
+      }
+      .fat-client-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 5px;
+      }
+      .fat-preview {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        min-height: 300px;
+      }
+      .fat-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-mid);
+        gap: 10px;
+      }
+      .fat-empty svg {
+        width: 40px;
+        height: 40px;
+        color: #d1d5db;
+      }
+      .fat-empty p {
+        font-size: 0.85rem;
+      }
+
+      /* PAGAMENTOS */
+      .pag-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .pag-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-sm);
+      }
+      .pag-label {
+        font-size: 0.75rem;
+        color: var(--gray-mid);
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .pag-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+      }
+      .pag-card.green .pag-value {
+        color: var(--green);
+      }
+      .pag-card.yellow .pag-value {
+        color: var(--yellow);
+      }
+      .pag-card.red .pag-value {
+        color: var(--red);
+      }
+      .pag-card.black .pag-value {
+        color: var(--gray-main);
+      }
+
+      .pag-status-select {
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--white);
+        color: var(--gray-main);
+      }
+
+      /* RELATÓRIOS */
+      .rel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .rel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+      .rel-title svg {
+        width: 18px;
+        height: 18px;
+        color: var(--blue-vivid);
+      }
+      .rel-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .rel-table-wrap {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead {
+        background: var(--gray-bg);
+      }
+      th {
+        padding: 12px 20px;
+        text-align: left;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--gray-mid);
+        border-bottom: 1px solid var(--border);
+      }
+      th:not(:first-child) {
+        text-align: right;
+      }
+      td {
+        padding: 14px 20px;
+        font-size: 0.85rem;
+        border-bottom: 1px solid var(--border);
+      }
+      td:not(:first-child) {
+        text-align: right;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr.total-row td {
+        font-weight: 700;
+        background: var(--gray-bg);
+      }
+      tbody tr:hover {
+        background: #fafafa;
+      }
+
+      /* EMPTY */
+      .empty-state {
+        padding: 48px 24px;
+        text-align: center;
+        color: var(--gray-mid);
+      }
+      .empty-state svg {
+        width: 36px;
+        height: 36px;
+        color: #d1d5db;
+        margin: 0 auto 10px;
+      }
+      .empty-state p {
+        font-size: 0.85rem;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .pag-summary {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .fat-layout {
+          grid-template-columns: 1fr;
+        }
+        .tab-btn span {
+          display: none;
+        }
+      }
+      @media (max-width: 600px) {
+        .metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .tabs-bar {
+          gap: 2px;
+        }
+        .tab-btn {
+          padding: 8px 6px;
+        }
+        .content-wrap {
+          padding: 16px 10px;
+        }
+        .card-right {
+          display: none;
+        }
+        .toolbar {
+          gap: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <header id="header">
+      <div class="header-logo">
+        <svg
+          class="logo-svg"
+          viewBox="0 0 44 44"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M22 2 L38 8 L38 24 C38 33 22 42 22 42 C22 42 6 33 6 24 L6 8 Z"
+            fill="#0453cc"
+            stroke="#fff"
+            stroke-width="1.5"
+          />
+          <text
+            x="22"
+            y="27"
+            text-anchor="middle"
+            font-family="DM Sans,sans-serif"
+            font-weight="800"
+            font-size="13"
+            fill="white"
+          >
+            LS
+          </text>
+        </svg>
+        <span class="header-title">LS Check Admin</span>
+      </div>
+      <div class="header-actions">
+        <button title="Atualizar" onclick="location.reload()">
+          <i data-lucide="refresh-cw"></i>
+        </button>
+        <button title="Download"><i data-lucide="download"></i></button>
+        <button title="Upload"><i data-lucide="upload"></i></button>
+        <button title="Sair"><i data-lucide="log-out"></i></button>
+      </div>
+    </header>
+
+    <div id="app">
+      <div class="content-wrap">
+        <!-- METRICS -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Total Pedidos</div>
+            <div class="metric-value black" id="m-total">17</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pendentes</div>
+            <div class="metric-value yellow" id="m-pendentes">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Enviados</div>
+            <div class="metric-value green" id="m-enviados">17</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Admins</div>
+            <div class="metric-value black" id="m-admins">1</div>
+          </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-bar">
+          <button class="tab-btn active" data-tab="pedidos">
+            <i data-lucide="file-text"></i><span>Pedidos</span>
+          </button>
+          <button class="tab-btn" data-tab="usuarios">
+            <i data-lucide="users"></i><span>Usuários</span>
+          </button>
+          <button class="tab-btn" data-tab="faturamento">
+            <i data-lucide="receipt"></i><span>Faturamento</span>
+          </button>
+          <button class="tab-btn" data-tab="pagamentos">
+            <i data-lucide="credit-card"></i><span>Pagamentos</span>
+          </button>
+          <button class="tab-btn" data-tab="relatorios">
+            <i data-lucide="bar-chart-2"></i><span>Relatórios</span>
+          </button>
+        </div>
+
+        <!-- ABA PEDIDOS -->
+        <div class="tab-panel active" id="tab-pedidos">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i data-lucide="search"></i>
+              <input
+                type="text"
+                id="pedido-search"
+                placeholder="Buscar por nome, placa, protocolo..."
+              />
+            </div>
+            <input type="date" class="date-input" title="Data início" />
+            <input type="date" class="date-input" title="Data fim" />
+            <select class="filter-select" id="pedido-status">
+              <option value="">Todos Status</option>
+              <option value="Enviado">Enviado</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+            <button class="btn-primary" onclick="novoPedido()">
+              <i data-lucide="plus"></i> Novo Pedido
+            </button>
+          </div>
+          <div id="pedidos-list"></div>
+        </div>
+
+        <!-- ABA USUARIOS -->
+        <div class="tab-panel" id="tab-usuarios">
+          <div class="section-header">
+            <div class="section-title">
+              <i data-lucide="shield-check"></i> Administradores
+            </div>
+            <button class="btn-primary" onclick="novoAdmin()">
+              <i data-lucide="user-plus"></i> Novo Admin
+            </button>
+          </div>
+          <div id="admins-list"></div>
+
+          <div class="section-header">
+            <div class="section-title">
+              <i data-lucide="user"></i> Usuários Comuns
+            </div>
+            <button class="btn-secondary" onclick="novoUsuario()">
+              <i data-lucide="user-plus"></i> Novo Usuário
+            </button>
+          </div>
+          <div id="usuarios-list"></div>
+        </div>
+
+        <!-- ABA FATURAMENTO -->
+        <div class="tab-panel" id="tab-faturamento">
+          <div class="fat-layout">
+            <div class="fat-sidebar">
+              <div class="toolbar" style="margin-bottom: 0">
+                <div class="search-wrap" style="flex: 1">
+                  <i data-lucide="search"></i>
+                  <input
+                    type="text"
+                    id="fat-search"
+                    placeholder="Buscar cliente..."
+                    oninput="filtrarClientes()"
+                  />
+                </div>
+                <button class="btn-primary" onclick="novoCliente()">
+                  <i data-lucide="user-plus"></i> Novo
+                </button>
+              </div>
+              <div class="fat-list" id="fat-list"></div>
+            </div>
+            <div class="fat-preview" id="fat-preview">
+              <div class="fat-empty">
+                <i data-lucide="file-text"></i>
+                <p>Selecione um cliente para ver a fatura</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA PAGAMENTOS -->
+        <div class="tab-panel" id="tab-pagamentos">
+          <div class="toolbar" style="margin-bottom: 14px">
+            <select
+              class="filter-select"
+              id="pag-filter"
+              onchange="renderPagamentos()"
+            >
+              <option value="">Todos Pagamentos</option>
+              <option value="Pago">Pagos</option>
+              <option value="Aguardando">Aguardando</option>
+              <option value="Reembolsado">Reembolsados</option>
+              <option value="Não Pago">Não Pagos</option>
+            </select>
+          </div>
+          <div class="pag-summary" id="pag-summary"></div>
+          <div id="pagamentos-list"></div>
+        </div>
+
+        <!-- ABA RELATÓRIOS -->
+        <div class="tab-panel" id="tab-relatorios">
+          <div class="rel-header">
+            <div class="rel-title">
+              <i data-lucide="file-bar-chart"></i> Relatório de Custos por
+              Consulta
+            </div>
+            <div class="rel-controls">
+              <input type="month" class="date-input" value="2026-05" />
+              <button class="btn-primary">
+                <i data-lucide="download"></i> Exportar
+              </button>
+            </div>
+          </div>
+          <div class="rel-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo de Consulta</th>
+                  <th>Quantidade</th>
+                  <th>Custo Unitário</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="rel-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- /content-wrap -->
+    </div>
+    <!-- /app -->
+
+    <script>
+      /* ==============================
+   DADOS MOCKADOS
+============================== */
+      let pedidos = [
+        {
+          id: 1,
+          protocolo: "VC260514NAL359",
+          placa: "KLF3H22",
+          cliente: "Lincoln",
+          status: "Enviado",
+          pago: "Não Pago",
+          data: "14/05/2026",
+          tipo: "Consulta Veicular Completa",
+        },
+        {
+          id: 2,
+          protocolo: "VC260514CLVJ5E",
+          placa: "PIZ3801",
+          cliente: "tESTe",
+          status: "Enviado",
+          pago: "Não Pago",
+          data: "14/05/2026",
+          tipo: "Consulta Veicular Completa",
+        },
+        {
+          id: 3,
+          protocolo: "VC260503VFDWCW",
+          placa: "PCY6237",
+          cliente: "Lincoln",
+          status: "Enviado",
+          pago: "Não Pago",
+          data: "03/05/2026",
+          tipo: "Consulta Veicular Completa",
+        },
+        {
+          id: 4,
+          protocolo: "VC260420ABCDEF",
+          placa: "ABC1234",
+          cliente: "Alan Emanuel",
+          status: "Enviado",
+          pago: "Pago",
+          data: "20/04/2026",
+          tipo: "Nacional (BIN)",
+        },
+        {
+          id: 5,
+          protocolo: "VC260418GHIJKL",
+          placa: "DEF5678",
+          cliente: "GRUPOCAR",
+          status: "Enviado",
+          pago: "Pago",
+          data: "18/04/2026",
+          tipo: "Débitos Veiculares",
+        },
+        {
+          id: 6,
+          protocolo: "VC260415MNOPQR",
+          placa: "GHI9012",
+          cliente: "LS SERVICOS",
+          status: "Enviado",
+          pago: "Pago",
+          data: "15/04/2026",
+          tipo: "Decodificador",
+        },
+        {
+          id: 7,
+          protocolo: "VC260412STUVWX",
+          placa: "JKL3456",
+          cliente: "Alan Emanuel",
+          status: "Enviado",
+          pago: "Pago",
+          data: "12/04/2026",
+          tipo: "Indício de Sinistro",
+        },
+        {
+          id: 8,
+          protocolo: "VC260410YZABCD",
+          placa: "MNO7890",
+          cliente: "GRUPOCAR",
+          status: "Enviado",
+          pago: "Pago",
+          data: "10/04/2026",
+          tipo: "Nacional (BIN)",
+        },
+        {
+          id: 9,
+          protocolo: "VC260408EFGHIJ",
+          placa: "PQR1234",
+          cliente: "Lincoln",
+          status: "Enviado",
+          pago: "Pago",
+          data: "08/04/2026",
+          tipo: "Débitos Veiculares",
+        },
+        {
+          id: 10,
+          protocolo: "VC260405KLMNOP",
+          placa: "STU5678",
+          cliente: "LS SERVICOS",
+          status: "Enviado",
+          pago: "Pago",
+          data: "05/04/2026",
+          tipo: "Decodificador",
+        },
+        {
+          id: 11,
+          protocolo: "VC260402QRSTUV",
+          placa: "VWX9012",
+          cliente: "Alan Emanuel",
+          status: "Enviado",
+          pago: "Pago",
+          data: "02/04/2026",
+          tipo: "Nacional (BIN)",
+        },
+        {
+          id: 12,
+          protocolo: "VC260329WXYZAB",
+          placa: "YZA3456",
+          cliente: "GRUPOCAR",
+          status: "Enviado",
+          pago: "Pago",
+          data: "29/03/2026",
+          tipo: "Indício de Sinistro",
+        },
+        {
+          id: 13,
+          protocolo: "VC260325CDEFGH",
+          placa: "BCD7890",
+          cliente: "Lincoln",
+          status: "Enviado",
+          pago: "Aguardando",
+          data: "25/03/2026",
+          tipo: "Consulta Veicular Completa",
+        },
+        {
+          id: 14,
+          protocolo: "VC260320IJKLMN",
+          placa: "EFG1234",
+          cliente: "LS SERVICOS",
+          status: "Enviado",
+          pago: "Pago",
+          data: "20/03/2026",
+          tipo: "Nacional (BIN)",
+        },
+        {
+          id: 15,
+          protocolo: "VC260315OPQRST",
+          placa: "HIJ5678",
+          cliente: "Alan Emanuel",
+          status: "Enviado",
+          pago: "Pago",
+          data: "15/03/2026",
+          tipo: "Decodificador",
+        },
+        {
+          id: 16,
+          protocolo: "VC260310UVWXYZ",
+          placa: "KLM9012",
+          cliente: "GRUPOCAR",
+          status: "Enviado",
+          pago: "Aguardando",
+          data: "10/03/2026",
+          tipo: "Indício de Sinistro",
+        },
+        {
+          id: 17,
+          protocolo: "VC260305ABCDEF",
+          placa: "NOP3456",
+          cliente: "Lincoln",
+          status: "Enviado",
+          pago: "Aguardando",
+          data: "05/03/2026",
+          tipo: "Débitos Veiculares",
+        },
+      ];
+
+      let admins = [
+        {
+          id: 1,
+          nome: "Lincoln Santos",
+          email: "lincolneng2001@outlook.com",
+          role: "Admin",
+          data: "14/03/2026",
+        },
+      ];
+
+      let usuarios = [
+        {
+          id: 1,
+          nome: "Alan Emanuel de Amorim",
+          email: "alanemanel45@gmail.com",
+        },
+        {
+          id: 2,
+          nome: "LS SERVICOS DE ENGENHARIA",
+          email: "ls.servicos@email.com",
+        },
+        { id: 3, nome: "GRUPOCAR", email: "grupocar@email.com" },
+      ];
+
+      let clientes = [
+        {
+          id: 1,
+          nome: "Alan Emanuel de Amorim",
+          preco: "42,20",
+          tipo: "por consulta",
+        },
+        { id: 2, nome: "GRUPOCAR", preco: "34,90", tipo: "por consulta" },
+        {
+          id: 3,
+          nome: "LS SERVICOS DE ENGENHARIA",
+          preco: "5,00",
+          tipo: "Mensal",
+        },
+      ];
+
+      const relatorio = [
+        { tipo: "Nacional (BIN)", qtd: 4, custo: 2.41 },
+        { tipo: "Débitos Veiculares", qtd: 2, custo: 2.3 },
+        { tipo: "Decodificador", qtd: 3, custo: 1.63 },
+        { tipo: "Indício de Sinistro", qtd: 3, custo: 1.62 },
+        { tipo: "Consulta Veicular Completa", qtd: 5, custo: 8.5 },
+      ];
+
+      /* ==============================
+   UTILITÁRIOS
+============================== */
+      function fmt(v) {
+        return `R$\u00a0${v}`;
+      }
+
+      function atualizarMetricas() {
+        document.getElementById("m-total").textContent = pedidos.length;
+        document.getElementById("m-pendentes").textContent = pedidos.filter(
+          (p) => p.status === "Pendente",
+        ).length;
+        document.getElementById("m-enviados").textContent = pedidos.filter(
+          (p) => p.status === "Enviado",
+        ).length;
+        document.getElementById("m-admins").textContent = admins.length;
+      }
+
+      function confirm2(msg) {
+        return confirm(msg);
+      }
+
+      /* ==============================
+   PEDIDOS
+============================== */
+      function renderPedidos() {
+        const search = document
+          .getElementById("pedido-search")
+          .value.toLowerCase();
+        const status = document.getElementById("pedido-status").value;
+        const list = document.getElementById("pedidos-list");
+
+        let filtered = pedidos.filter((p) => {
+          const matchSearch =
+            !search ||
+            p.protocolo.toLowerCase().includes(search) ||
+            p.cliente.toLowerCase().includes(search) ||
+            p.placa.toLowerCase().includes(search);
+          const matchStatus = !status || p.status === status;
+          return matchSearch && matchStatus;
+        });
+
+        if (!filtered.length) {
+          list.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum pedido encontrado.</p></div>`;
+          lucide.createIcons();
+          return;
+        }
+
+        list.innerHTML = filtered
+          .map(
+            (p) => `
+    <div class="list-card" id="pedido-${p.id}">
+      <div class="card-icon-wrap green-icon">
+        <i data-lucide="check-circle-2"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="card-title">${p.protocolo}</span>
+          <span class="badge ${p.status === "Enviado" ? "badge-blue" : "badge-yellow"}">${p.status}</span>
+          <span class="badge ${p.pago === "Pago" ? "badge-green" : p.pago === "Aguardando" ? "badge-yellow" : "badge-red"}">${p.pago}</span>
+        </div>
+        <div class="card-sub">${p.cliente} &middot; ${p.placa}</div>
+      </div>
+      <div class="card-right">
+        <span class="card-date">${p.data}</span>
+        <div class="action-btns">
+          <button class="action-btn danger" title="Excluir" onclick="deletarPedido(${p.id})"><i data-lucide="trash-2"></i></button>
+          <button class="action-btn" title="Comentar"><i data-lucide="message-circle"></i></button>
+          <button class="action-btn" title="Abrir externo"><i data-lucide="external-link"></i></button>
+          <button class="action-btn" title="Visualizar"><i data-lucide="eye"></i></button>
+        </div>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      function deletarPedido(id) {
+        if (!confirm2("Excluir este pedido?")) return;
+        pedidos = pedidos.filter((p) => p.id !== id);
+        renderPedidos();
+        atualizarMetricas();
+      }
+
+      function novoPedido() {
+        const protocolo = prompt("Protocolo do novo pedido:");
+        if (!protocolo) return;
+        const placa = prompt("Placa:") || "";
+        const cliente = prompt("Cliente:") || "";
+        pedidos.unshift({
+          id: Date.now(),
+          protocolo,
+          placa,
+          cliente,
+          status: "Pendente",
+          pago: "Não Pago",
+          data: new Date().toLocaleDateString("pt-BR"),
+          tipo: "Consulta Veicular Completa",
+        });
+        renderPedidos();
+        atualizarMetricas();
+      }
+
+      /* ==============================
+   USUÁRIOS
+============================== */
+      function renderUsuarios() {
+        const al = document.getElementById("admins-list");
+        al.innerHTML = admins
+          .map(
+            (a) => `
+    <div class="list-card" id="admin-${a.id}">
+      <div class="card-icon-wrap">
+        <i data-lucide="shield"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="card-title">${a.nome}</span>
+          <span class="badge badge-gray">${a.role}</span>
+        </div>
+        <div class="card-sub">${a.email}</div>
+      </div>
+      <div class="card-right">
+        <span class="card-date">${a.data}</span>
+        <div class="action-btns">
+          <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
+          <button class="action-btn danger" title="Excluir" onclick="deletarAdmin(${a.id})"><i data-lucide="trash-2"></i></button>
+        </div>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+
+        const ul = document.getElementById("usuarios-list");
+        ul.innerHTML = usuarios
+          .map(
+            (u) => `
+    <div class="list-card" id="user-${u.id}">
+      <div class="card-icon-wrap">
+        <i data-lucide="user"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="card-title">${u.nome}</span>
+        </div>
+        <div class="card-sub">${u.email}</div>
+      </div>
+      <div class="card-right">
+        <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem" onclick="adicionarFaturamento(${u.id})">
+          <i data-lucide="plus"></i> Faturamento
+        </button>
+        <div class="action-btns">
+          <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
+          <button class="action-btn danger" title="Excluir" onclick="deletarUsuario(${u.id})"><i data-lucide="trash-2"></i></button>
+        </div>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      function deletarAdmin(id) {
+        if (!confirm2("Remover administrador?")) return;
+        admins = admins.filter((a) => a.id !== id);
+        renderUsuarios();
+        atualizarMetricas();
+      }
+
+      function deletarUsuario(id) {
+        if (!confirm2("Remover usuário?")) return;
+        usuarios = usuarios.filter((u) => u.id !== id);
+        renderUsuarios();
+      }
+
+      function novoAdmin() {
+        const nome = prompt("Nome do administrador:");
+        if (!nome) return;
+        const email = prompt("Email:") || "";
+        admins.push({
+          id: Date.now(),
+          nome,
+          email,
+          role: "Admin",
+          data: new Date().toLocaleDateString("pt-BR"),
+        });
+        renderUsuarios();
+        atualizarMetricas();
+      }
+
+      function novoUsuario() {
+        const nome = prompt("Nome do usuário:");
+        if (!nome) return;
+        const email = prompt("Email:") || "";
+        usuarios.push({ id: Date.now(), nome, email });
+        renderUsuarios();
+      }
+
+      function adicionarFaturamento(id) {
+        const u = usuarios.find((u) => u.id === id);
+        alert(
+          `Faturamento para: ${u.nome}\n(Implemente a lógica de faturamento aqui)`,
+        );
+      }
+
+      /* ==============================
+   FATURAMENTO
+============================== */
+      let selectedClient = null;
+
+      function renderFaturamento() {
+        const list = document.getElementById("fat-list");
+        list.innerHTML = clientes
+          .map(
+            (c) => `
+    <div class="fat-client ${selectedClient === c.id ? "selected" : ""}" onclick="selecionarCliente(${c.id})">
+      <div class="ci"><i data-lucide="dollar-sign"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="cname">${c.nome}</div>
+        <div class="cprice">R$\u00a0${c.preco}/${c.tipo}${c.tipo === "Mensal" ? ' &middot; <span class="badge badge-blue" style="font-size:0.65rem">Mensal</span>' : ""}</div>
+      </div>
+      <div class="fat-client-actions">
+        <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
+        <button class="action-btn danger" title="Excluir" onclick="event.stopPropagation();deletarCliente(${c.id})"><i data-lucide="trash-2"></i></button>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+
+        if (selectedClient) {
+          const c = clientes.find((x) => x.id === selectedClient);
+          const pedidosCli = pedidos.filter((p) =>
+            p.cliente
+              .toLowerCase()
+              .includes(c.nome.split(" ")[0].toLowerCase()),
+          );
+          document.getElementById("fat-preview").innerHTML = `
+      <div style="margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px">
+        <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${c.nome}</div>
+        <div style="font-size:0.8rem;color:var(--gray-mid)">R$\u00a0${c.preco} / ${c.tipo}</div>
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;margin-bottom:10px">Pedidos recentes</div>
+      ${
+        pedidosCli.length
+          ? pedidosCli
+              .slice(0, 5)
+              .map(
+                (p) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:0.82rem;font-weight:600">${p.protocolo}</div>
+            <div style="font-size:0.75rem;color:var(--gray-mid)">${p.placa} &middot; ${p.data}</div>
+          </div>
+          <span class="badge ${p.pago === "Pago" ? "badge-green" : "badge-red"}">${p.pago}</span>
+        </div>
+      `,
+              )
+              .join("")
+          : '<div style="color:var(--gray-mid);font-size:0.82rem">Nenhum pedido encontrado.</div>'
+      }
+    `;
+        } else {
+          document.getElementById("fat-preview").innerHTML = `
+      <div class="fat-empty">
+        <i data-lucide="file-text"></i>
+        <p>Selecione um cliente para ver a fatura</p>
+      </div>
+    `;
+        }
+        lucide.createIcons();
+      }
+
+      function selecionarCliente(id) {
+        selectedClient = selectedClient === id ? null : id;
+        renderFaturamento();
+      }
+
+      function editarCliente(id) {
+        const c = clientes.find((x) => x.id === id);
+        const preco = prompt(`Novo preço para ${c.nome}:`, c.preco);
+        if (preco) c.preco = preco;
+        renderFaturamento();
+      }
+
+      function deletarCliente(id) {
+        if (!confirm2("Remover cliente do faturamento?")) return;
+        clientes = clientes.filter((c) => c.id !== id);
+        if (selectedClient === id) selectedClient = null;
+        renderFaturamento();
+      }
+
+      function novoCliente() {
+        const nome = prompt("Nome do cliente:");
+        if (!nome) return;
+        const preco = prompt("Preço por consulta (ex: 42,20):") || "0,00";
+        const tipo = prompt("Tipo (por consulta / Mensal):") || "por consulta";
+        clientes.push({ id: Date.now(), nome, preco, tipo });
+        renderFaturamento();
+      }
+
+      function filtrarClientes() {
+        const q = document.getElementById("fat-search").value.toLowerCase();
+        const list = document.getElementById("fat-list");
+        const items = clientes.filter((c) => c.nome.toLowerCase().includes(q));
+        list.innerHTML = items
+          .map(
+            (c) => `
+    <div class="fat-client ${selectedClient === c.id ? "selected" : ""}" onclick="selecionarCliente(${c.id})">
+      <div class="ci"><i data-lucide="dollar-sign"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="cname">${c.nome}</div>
+        <div class="cprice">R$\u00a0${c.preco}/${c.tipo}</div>
+      </div>
+      <div class="fat-client-actions">
+        <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
+        <button class="action-btn danger" title="Excluir" onclick="event.stopPropagation();deletarCliente(${c.id})"><i data-lucide="trash-2"></i></button>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      /* ==============================
+   PAGAMENTOS
+============================== */
+      function renderPagamentos() {
+        const filter = document.getElementById("pag-filter").value;
+
+        // summary
+        const pagos = pedidos.filter((p) => p.pago === "Pago").length;
+        const aguardando = pedidos.filter(
+          (p) => p.pago === "Aguardando",
+        ).length;
+        const reembolsado = pedidos.filter(
+          (p) => p.pago === "Reembolsado",
+        ).length;
+        const naoPago = pedidos.filter((p) => p.pago === "Não Pago").length;
+
+        document.getElementById("pag-summary").innerHTML = `
+    <div class="pag-card green"><div class="pag-label">Pagos</div><div class="pag-value">${pagos}</div></div>
+    <div class="pag-card yellow"><div class="pag-label">Aguardando</div><div class="pag-value">${aguardando}</div></div>
+    <div class="pag-card red"><div class="pag-label">Reembolsados</div><div class="pag-value">${reembolsado}</div></div>
+    <div class="pag-card black"><div class="pag-label">Não Pagos</div><div class="pag-value">${naoPago}</div></div>
+  `;
+
+        let filtered = filter
+          ? pedidos.filter((p) => p.pago === filter)
+          : pedidos;
+
+        const list = document.getElementById("pagamentos-list");
+        if (!filtered.length) {
+          list.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum registro.</p></div>`;
+          lucide.createIcons();
+          return;
+        }
+
+        list.innerHTML = filtered
+          .map(
+            (p) => `
+    <div class="list-card">
+      <div class="card-icon-wrap">
+        <i data-lucide="dollar-sign"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-top">
+          <span class="card-title">${p.protocolo}</span>
+          <span class="badge ${p.pago === "Pago" ? "badge-green" : p.pago === "Aguardando" ? "badge-yellow" : "badge-red"}" id="badge-pag-${p.id}">${p.pago}</span>
+          <span class="badge ${p.status === "Enviado" ? "badge-blue" : "badge-yellow"}">${p.status}</span>
+        </div>
+        <div class="card-sub">${p.cliente} &middot; ${p.placa} &middot; ${p.tipo}</div>
+      </div>
+      <div class="card-right">
+        <span class="card-date">${p.data}</span>
+        <select class="pag-status-select" onchange="mudarPagamento(${p.id}, this.value)">
+          <option ${p.pago === "Não Pago" ? "selected" : ""}>Não Pago</option>
+          <option ${p.pago === "Aguardando" ? "selected" : ""}>Aguardando</option>
+          <option ${p.pago === "Pago" ? "selected" : ""}>Pago</option>
+          <option ${p.pago === "Reembolsado" ? "selected" : ""}>Reembolsado</option>
+        </select>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      function mudarPagamento(id, valor) {
+        const p = pedidos.find((x) => x.id === id);
+        if (p) p.pago = valor;
+        renderPagamentos();
+        atualizarMetricas();
+      }
+
+      /* ==============================
+   RELATÓRIOS
+============================== */
+      function renderRelatorio() {
+        const tbody = document.getElementById("rel-tbody");
+        let totalQtd = 0,
+          totalVal = 0;
+
+        tbody.innerHTML =
+          relatorio
+            .map((r) => {
+              const tot = r.qtd * r.custo;
+              totalQtd += r.qtd;
+              totalVal += tot;
+              return `<tr>
+      <td>${r.tipo}</td>
+      <td>${r.qtd}</td>
+      <td>R$ ${r.custo.toFixed(2).replace(".", ",")}</td>
+      <td>R$ ${tot.toFixed(2).replace(".", ",")}</td>
+    </tr>`;
+            })
+            .join("") +
+          `<tr class="total-row">
+    <td>Total Geral</td>
+    <td>${totalQtd}</td>
+    <td>—</td>
+    <td>R$ ${totalVal.toFixed(2).replace(".", ",")}</td>
+  </tr>`;
+      }
+
+      /* ==============================
+   TABS
+============================== */
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-panel")
+            .forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .getElementById("tab-" + btn.dataset.tab)
+            .classList.add("active");
+        });
+      });
+
+      document
+        .getElementById("pedido-search")
+        .addEventListener("input", renderPedidos);
+      document
+        .getElementById("pedido-status")
+        .addEventListener("change", renderPedidos);
+
+      /* ==============================
+   INIT
+============================== */
+      lucide.createIcons();
+      atualizarMetricas();
+      renderPedidos();
+      renderUsuarios();
+      renderFaturamento();
+      renderPagamentos();
+      renderRelatorio();
+    </script>
+  </body>
+</html>
