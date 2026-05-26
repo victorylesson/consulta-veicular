@@ -1,4 +1,9 @@
 # 🛡️ LS Check — Verificação Técnica Veicular
+![HTML](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Frontend](https://img.shields.io/badge/100%25%20Frontend-informational)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
 Sistema web completo para consulta de histórico veicular, com landing page pública, painel administrativo e tela de autenticação.
 
