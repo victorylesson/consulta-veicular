@@ -15,7 +15,7 @@ Sistema web completo para consulta de histórico veicular, com landing page púb
 ## 📁 Estrutura do Projeto
 
 ```
-ls-check/
+cd consulta-veicular/
 ├── index.html       # Landing page pública
 ├── style.css        # Estilos da landing page
 ├── script.js        # Interações da landing page
