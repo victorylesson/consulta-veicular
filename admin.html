@@ -593,7 +593,6 @@
       .pag-card.black .pag-value {
         color: var(--gray-main);
       }
-
       .pag-status-select {
         padding: 6px 10px;
         border: 1px solid var(--border);
@@ -727,6 +726,7 @@
         }
       }
     </style>
+    <base target="_blank" />
   </head>
   <body>
     <!-- HEADER -->
@@ -763,7 +763,9 @@
         </button>
         <button title="Download"><i data-lucide="download"></i></button>
         <button title="Upload"><i data-lucide="upload"></i></button>
-        <button title="Sair"><i data-lucide="log-out"></i></button>
+        <button title="Sair" onclick="logout()">
+          <i data-lucide="log-out"></i>
+        </button>
       </div>
     </header>
 
@@ -773,7 +775,7 @@
         <div class="metrics-grid">
           <div class="metric-card">
             <div class="metric-label">Total Pedidos</div>
-            <div class="metric-value black" id="m-total">17</div>
+            <div class="metric-value black" id="m-total">0</div>
           </div>
           <div class="metric-card">
             <div class="metric-label">Pendentes</div>
@@ -781,11 +783,11 @@
           </div>
           <div class="metric-card">
             <div class="metric-label">Enviados</div>
-            <div class="metric-value green" id="m-enviados">17</div>
+            <div class="metric-value green" id="m-enviados">0</div>
           </div>
           <div class="metric-card">
             <div class="metric-label">Admins</div>
-            <div class="metric-value black" id="m-admins">1</div>
+            <div class="metric-value black" id="m-admins">0</div>
           </div>
         </div>
 
@@ -831,7 +833,12 @@
               <i data-lucide="plus"></i> Novo Pedido
             </button>
           </div>
-          <div id="pedidos-list"></div>
+          <div id="pedidos-list">
+            <div class="empty-state">
+              <i data-lucide="inbox"></i>
+              <p>Carregando...</p>
+            </div>
+          </div>
         </div>
 
         <!-- ABA USUARIOS -->
@@ -844,7 +851,12 @@
               <i data-lucide="user-plus"></i> Novo Admin
             </button>
           </div>
-          <div id="admins-list"></div>
+          <div id="admins-list">
+            <div class="empty-state">
+              <i data-lucide="inbox"></i>
+              <p>Carregando...</p>
+            </div>
+          </div>
 
           <div class="section-header">
             <div class="section-title">
@@ -854,7 +866,12 @@
               <i data-lucide="user-plus"></i> Novo Usuário
             </button>
           </div>
-          <div id="usuarios-list"></div>
+          <div id="usuarios-list">
+            <div class="empty-state">
+              <i data-lucide="inbox"></i>
+              <p>Carregando...</p>
+            </div>
+          </div>
         </div>
 
         <!-- ABA FATURAMENTO -->
@@ -875,7 +892,12 @@
                   <i data-lucide="user-plus"></i> Novo
                 </button>
               </div>
-              <div class="fat-list" id="fat-list"></div>
+              <div class="fat-list" id="fat-list">
+                <div class="empty-state">
+                  <i data-lucide="inbox"></i>
+                  <p>Carregando...</p>
+                </div>
+              </div>
             </div>
             <div class="fat-preview" id="fat-preview">
               <div class="fat-empty">
@@ -902,7 +924,12 @@
             </select>
           </div>
           <div class="pag-summary" id="pag-summary"></div>
-          <div id="pagamentos-list"></div>
+          <div id="pagamentos-list">
+            <div class="empty-state">
+              <i data-lucide="inbox"></i>
+              <p>Carregando...</p>
+            </div>
+          </div>
         </div>
 
         <!-- ABA RELATÓRIOS -->
@@ -929,265 +956,172 @@
                   <th>Total</th>
                 </tr>
               </thead>
-              <tbody id="rel-tbody"></tbody>
+              <tbody id="rel-tbody">
+                <tr>
+                  <td colspan="4" class="empty-state">
+                    <i data-lucide="inbox"></i>
+                    <p>Carregando...</p>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
       </div>
-      <!-- /content-wrap -->
     </div>
-    <!-- /app -->
 
     <script>
-      /* ==============================
-   DADOS MOCKADOS
-============================== */
-      let pedidos = [
-        {
-          id: 1,
-          protocolo: "VC260514NAL359",
-          placa: "KLF3H22",
-          cliente: "Lincoln",
-          status: "Enviado",
-          pago: "Não Pago",
-          data: "14/05/2026",
-          tipo: "Consulta Veicular Completa",
-        },
-        {
-          id: 2,
-          protocolo: "VC260514CLVJ5E",
-          placa: "PIZ3801",
-          cliente: "tESTe",
-          status: "Enviado",
-          pago: "Não Pago",
-          data: "14/05/2026",
-          tipo: "Consulta Veicular Completa",
-        },
-        {
-          id: 3,
-          protocolo: "VC260503VFDWCW",
-          placa: "PCY6237",
-          cliente: "Lincoln",
-          status: "Enviado",
-          pago: "Não Pago",
-          data: "03/05/2026",
-          tipo: "Consulta Veicular Completa",
-        },
-        {
-          id: 4,
-          protocolo: "VC260420ABCDEF",
-          placa: "ABC1234",
-          cliente: "Alan Emanuel",
-          status: "Enviado",
-          pago: "Pago",
-          data: "20/04/2026",
-          tipo: "Nacional (BIN)",
-        },
-        {
-          id: 5,
-          protocolo: "VC260418GHIJKL",
-          placa: "DEF5678",
-          cliente: "GRUPOCAR",
-          status: "Enviado",
-          pago: "Pago",
-          data: "18/04/2026",
-          tipo: "Débitos Veiculares",
-        },
-        {
-          id: 6,
-          protocolo: "VC260415MNOPQR",
-          placa: "GHI9012",
-          cliente: "LS SERVICOS",
-          status: "Enviado",
-          pago: "Pago",
-          data: "15/04/2026",
-          tipo: "Decodificador",
-        },
-        {
-          id: 7,
-          protocolo: "VC260412STUVWX",
-          placa: "JKL3456",
-          cliente: "Alan Emanuel",
-          status: "Enviado",
-          pago: "Pago",
-          data: "12/04/2026",
-          tipo: "Indício de Sinistro",
-        },
-        {
-          id: 8,
-          protocolo: "VC260410YZABCD",
-          placa: "MNO7890",
-          cliente: "GRUPOCAR",
-          status: "Enviado",
-          pago: "Pago",
-          data: "10/04/2026",
-          tipo: "Nacional (BIN)",
-        },
-        {
-          id: 9,
-          protocolo: "VC260408EFGHIJ",
-          placa: "PQR1234",
-          cliente: "Lincoln",
-          status: "Enviado",
-          pago: "Pago",
-          data: "08/04/2026",
-          tipo: "Débitos Veiculares",
-        },
-        {
-          id: 10,
-          protocolo: "VC260405KLMNOP",
-          placa: "STU5678",
-          cliente: "LS SERVICOS",
-          status: "Enviado",
-          pago: "Pago",
-          data: "05/04/2026",
-          tipo: "Decodificador",
-        },
-        {
-          id: 11,
-          protocolo: "VC260402QRSTUV",
-          placa: "VWX9012",
-          cliente: "Alan Emanuel",
-          status: "Enviado",
-          pago: "Pago",
-          data: "02/04/2026",
-          tipo: "Nacional (BIN)",
-        },
-        {
-          id: 12,
-          protocolo: "VC260329WXYZAB",
-          placa: "YZA3456",
-          cliente: "GRUPOCAR",
-          status: "Enviado",
-          pago: "Pago",
-          data: "29/03/2026",
-          tipo: "Indício de Sinistro",
-        },
-        {
-          id: 13,
-          protocolo: "VC260325CDEFGH",
-          placa: "BCD7890",
-          cliente: "Lincoln",
-          status: "Enviado",
-          pago: "Aguardando",
-          data: "25/03/2026",
-          tipo: "Consulta Veicular Completa",
-        },
-        {
-          id: 14,
-          protocolo: "VC260320IJKLMN",
-          placa: "EFG1234",
-          cliente: "LS SERVICOS",
-          status: "Enviado",
-          pago: "Pago",
-          data: "20/03/2026",
-          tipo: "Nacional (BIN)",
-        },
-        {
-          id: 15,
-          protocolo: "VC260315OPQRST",
-          placa: "HIJ5678",
-          cliente: "Alan Emanuel",
-          status: "Enviado",
-          pago: "Pago",
-          data: "15/03/2026",
-          tipo: "Decodificador",
-        },
-        {
-          id: 16,
-          protocolo: "VC260310UVWXYZ",
-          placa: "KLM9012",
-          cliente: "GRUPOCAR",
-          status: "Enviado",
-          pago: "Aguardando",
-          data: "10/03/2026",
-          tipo: "Indício de Sinistro",
-        },
-        {
-          id: 17,
-          protocolo: "VC260305ABCDEF",
-          placa: "NOP3456",
-          cliente: "Lincoln",
-          status: "Enviado",
-          pago: "Aguardando",
-          data: "05/03/2026",
-          tipo: "Débitos Veiculares",
-        },
-      ];
+      // ============================================
+      // CONFIG - BACKEND VAI PASSAR A URL REAL
+      // ============================================
+      const API_URL = "https://api.lscheck.com.br"; // <-- TROCAR PELA URL DO BACKEND
 
-      let admins = [
-        {
-          id: 1,
-          nome: "Lincoln Santos",
-          email: "lincolneng2001@outlook.com",
-          role: "Admin",
-          data: "14/03/2026",
-        },
-      ];
+      // ============================================
+      // PROTEÇÃO: verifica se está logado
+      // ============================================
+      const token = localStorage.getItem("token");
+      if (!token) {
+        location.href = "login.html";
+      }
 
-      let usuarios = [
-        {
-          id: 1,
-          nome: "Alan Emanuel de Amorim",
-          email: "alanemanel45@gmail.com",
-        },
-        {
-          id: 2,
-          nome: "LS SERVICOS DE ENGENHARIA",
-          email: "ls.servicos@email.com",
-        },
-        { id: 3, nome: "GRUPOCAR", email: "grupocar@email.com" },
-      ];
+      // ============================================
+      // API HELPER
+      // ============================================
+      async function api(endpoint, options = {}) {
+        const url = endpoint.startsWith("http") ? endpoint : API_URL + endpoint;
 
-      let clientes = [
-        {
-          id: 1,
-          nome: "Alan Emanuel de Amorim",
-          preco: "42,20",
-          tipo: "por consulta",
-        },
-        { id: 2, nome: "GRUPOCAR", preco: "34,90", tipo: "por consulta" },
-        {
-          id: 3,
-          nome: "LS SERVICOS DE ENGENHARIA",
-          preco: "5,00",
-          tipo: "Mensal",
-        },
-      ];
+        try {
+          const res = await fetch(url, {
+            ...options,
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json",
+              ...options.headers,
+            },
+          });
 
-      const relatorio = [
-        { tipo: "Nacional (BIN)", qtd: 4, custo: 2.41 },
-        { tipo: "Débitos Veiculares", qtd: 2, custo: 2.3 },
-        { tipo: "Decodificador", qtd: 3, custo: 1.63 },
-        { tipo: "Indício de Sinistro", qtd: 3, custo: 1.62 },
-        { tipo: "Consulta Veicular Completa", qtd: 5, custo: 8.5 },
-      ];
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            location.href = "login.html";
+            return;
+          }
 
-      /* ==============================
-   UTILITÁRIOS
-============================== */
+          if (!res.ok) {
+            const err = await res
+              .json()
+              .catch(() => ({ error: "Erro " + res.status }));
+            throw new Error(err.error || "Erro na requisição");
+          }
+
+          return res.json();
+        } catch (err) {
+          console.error("API Error:", err);
+          throw err;
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        location.href = "login.html";
+      }
+
+      // ============================================
+      // DADOS (vindos da API - inicialmente vazios)
+      // ============================================
+      let pedidos = [];
+      let admins = [];
+      let usuarios = [];
+      let clientes = [];
+      let selectedClient = null;
+
+      // ============================================
+      // CARREGAMENTO DE DADOS DA API
+      // ============================================
+      async function carregarPedidos() {
+        try {
+          const json = await api("/pedidos");
+          pedidos = json.data || [];
+          renderPedidos();
+          atualizarMetricas();
+        } catch (err) {
+          console.error("Erro ao carregar pedidos:", err);
+          document.getElementById("pedidos-list").innerHTML =
+            '<div class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar pedidos</p></div>';
+          lucide.createIcons();
+        }
+      }
+
+      async function carregarUsuarios() {
+        try {
+          const json = await api("/usuarios");
+          admins = json.data?.admins || [];
+          usuarios = json.data?.usuarios || [];
+          renderUsuarios();
+          atualizarMetricas();
+        } catch (err) {
+          console.error("Erro ao carregar usuários:", err);
+          document.getElementById("admins-list").innerHTML =
+            '<div class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></div>';
+          document.getElementById("usuarios-list").innerHTML =
+            '<div class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></div>';
+          lucide.createIcons();
+        }
+      }
+
+      async function carregarClientes() {
+        try {
+          const json = await api("/clientes");
+          clientes = json.data || [];
+          renderFaturamento();
+        } catch (err) {
+          console.error("Erro ao carregar clientes:", err);
+          document.getElementById("fat-list").innerHTML =
+            '<div class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></div>';
+          lucide.createIcons();
+        }
+      }
+
+      async function carregarRelatorio() {
+        try {
+          const json = await api("/relatorios");
+          renderRelatorio(json.data || [], json.totalGeral);
+        } catch (err) {
+          console.error("Erro ao carregar relatório:", err);
+          document.getElementById("rel-tbody").innerHTML =
+            '<tr><td colspan="4" class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></td></tr>';
+          lucide.createIcons();
+        }
+      }
+
+      async function carregarMetricas() {
+        try {
+          const json = await api("/metricas");
+          document.getElementById("m-total").textContent =
+            json.totalPedidos || 0;
+          document.getElementById("m-pendentes").textContent =
+            json.pendentes || 0;
+          document.getElementById("m-enviados").textContent =
+            json.enviados || 0;
+          document.getElementById("m-admins").textContent = json.admins || 0;
+        } catch (err) {
+          console.error("Erro ao carregar métricas:", err);
+        }
+      }
+
+      // ============================================
+      // UTILITÁRIOS
+      // ============================================
       function fmt(v) {
-        return `R$\u00a0${v}`;
+        return `R$ ${v}`;
       }
-
-      function atualizarMetricas() {
-        document.getElementById("m-total").textContent = pedidos.length;
-        document.getElementById("m-pendentes").textContent = pedidos.filter(
-          (p) => p.status === "Pendente",
-        ).length;
-        document.getElementById("m-enviados").textContent = pedidos.filter(
-          (p) => p.status === "Enviado",
-        ).length;
-        document.getElementById("m-admins").textContent = admins.length;
-      }
-
       function confirm2(msg) {
         return confirm(msg);
       }
 
-      /* ==============================
-   PEDIDOS
-============================== */
+      // ============================================
+      // PEDIDOS
+      // ============================================
       function renderPedidos() {
         const search = document
           .getElementById("pedido-search")
@@ -1215,9 +1149,7 @@
           .map(
             (p) => `
     <div class="list-card" id="pedido-${p.id}">
-      <div class="card-icon-wrap green-icon">
-        <i data-lucide="check-circle-2"></i>
-      </div>
+      <div class="card-icon-wrap green-icon"><i data-lucide="check-circle-2"></i></div>
       <div class="card-info">
         <div class="card-top">
           <span class="card-title">${p.protocolo}</span>
@@ -1242,143 +1174,179 @@
         lucide.createIcons();
       }
 
-      function deletarPedido(id) {
+      async function deletarPedido(id) {
         if (!confirm2("Excluir este pedido?")) return;
-        pedidos = pedidos.filter((p) => p.id !== id);
-        renderPedidos();
-        atualizarMetricas();
+        try {
+          await api(`/pedidos/${id}`, { method: "DELETE" });
+          pedidos = pedidos.filter((p) => p.id !== id);
+          renderPedidos();
+          atualizarMetricas();
+        } catch (err) {
+          alert("Erro ao excluir: " + err.message);
+        }
       }
 
-      function novoPedido() {
+      async function novoPedido() {
         const protocolo = prompt("Protocolo do novo pedido:");
         if (!protocolo) return;
         const placa = prompt("Placa:") || "";
         const cliente = prompt("Cliente:") || "";
-        pedidos.unshift({
-          id: Date.now(),
-          protocolo,
-          placa,
-          cliente,
-          status: "Pendente",
-          pago: "Não Pago",
-          data: new Date().toLocaleDateString("pt-BR"),
-          tipo: "Consulta Veicular Completa",
-        });
-        renderPedidos();
-        atualizarMetricas();
+
+        try {
+          const json = await api("/pedidos", {
+            method: "POST",
+            body: JSON.stringify({
+              protocolo,
+              placa,
+              cliente,
+              status: "Pendente",
+              pago: "Não Pago",
+              tipo: "Consulta Veicular Completa",
+            }),
+          });
+          pedidos.unshift(json.data);
+          renderPedidos();
+          atualizarMetricas();
+        } catch (err) {
+          alert("Erro ao criar: " + err.message);
+        }
       }
 
-      /* ==============================
-   USUÁRIOS
-============================== */
+      // ============================================
+      // USUÁRIOS
+      // ============================================
       function renderUsuarios() {
         const al = document.getElementById("admins-list");
-        al.innerHTML = admins
-          .map(
-            (a) => `
-    <div class="list-card" id="admin-${a.id}">
-      <div class="card-icon-wrap">
-        <i data-lucide="shield"></i>
-      </div>
-      <div class="card-info">
-        <div class="card-top">
-          <span class="card-title">${a.nome}</span>
-          <span class="badge badge-gray">${a.role}</span>
+        if (!admins.length) {
+          al.innerHTML =
+            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum administrador.</p></div>';
+        } else {
+          al.innerHTML = admins
+            .map(
+              (a) => `
+      <div class="list-card" id="admin-${a.id}">
+        <div class="card-icon-wrap"><i data-lucide="shield"></i></div>
+        <div class="card-info">
+          <div class="card-top"><span class="card-title">${a.nome}</span><span class="badge badge-gray">${a.role}</span></div>
+          <div class="card-sub">${a.email}</div>
         </div>
-        <div class="card-sub">${a.email}</div>
-      </div>
-      <div class="card-right">
-        <span class="card-date">${a.data}</span>
-        <div class="action-btns">
-          <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
-          <button class="action-btn danger" title="Excluir" onclick="deletarAdmin(${a.id})"><i data-lucide="trash-2"></i></button>
+        <div class="card-right">
+          <span class="card-date">${a.data}</span>
+          <div class="action-btns">
+            <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
+            <button class="action-btn danger" title="Excluir" onclick="deletarAdmin(${a.id})"><i data-lucide="trash-2"></i></button>
+          </div>
         </div>
       </div>
-    </div>
-  `,
-          )
-          .join("");
+    `,
+            )
+            .join("");
+        }
 
         const ul = document.getElementById("usuarios-list");
-        ul.innerHTML = usuarios
-          .map(
-            (u) => `
-    <div class="list-card" id="user-${u.id}">
-      <div class="card-icon-wrap">
-        <i data-lucide="user"></i>
-      </div>
-      <div class="card-info">
-        <div class="card-top">
-          <span class="card-title">${u.nome}</span>
+        if (!usuarios.length) {
+          ul.innerHTML =
+            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum usuário.</p></div>';
+        } else {
+          ul.innerHTML = usuarios
+            .map(
+              (u) => `
+      <div class="list-card" id="user-${u.id}">
+        <div class="card-icon-wrap"><i data-lucide="user"></i></div>
+        <div class="card-info">
+          <div class="card-top"><span class="card-title">${u.nome}</span></div>
+          <div class="card-sub">${u.email}</div>
         </div>
-        <div class="card-sub">${u.email}</div>
-      </div>
-      <div class="card-right">
-        <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem" onclick="adicionarFaturamento(${u.id})">
-          <i data-lucide="plus"></i> Faturamento
-        </button>
-        <div class="action-btns">
-          <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
-          <button class="action-btn danger" title="Excluir" onclick="deletarUsuario(${u.id})"><i data-lucide="trash-2"></i></button>
+        <div class="card-right">
+          <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem" onclick="adicionarFaturamento(${u.id})"><i data-lucide="plus"></i> Faturamento</button>
+          <div class="action-btns">
+            <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
+            <button class="action-btn danger" title="Excluir" onclick="deletarUsuario(${u.id})"><i data-lucide="trash-2"></i></button>
+          </div>
         </div>
       </div>
-    </div>
-  `,
-          )
-          .join("");
+    `,
+            )
+            .join("");
+        }
         lucide.createIcons();
       }
 
-      function deletarAdmin(id) {
+      async function deletarAdmin(id) {
         if (!confirm2("Remover administrador?")) return;
-        admins = admins.filter((a) => a.id !== id);
-        renderUsuarios();
-        atualizarMetricas();
+        try {
+          await api(`/usuarios/${id}`, { method: "DELETE" });
+          admins = admins.filter((a) => a.id !== id);
+          renderUsuarios();
+          atualizarMetricas();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
-      function deletarUsuario(id) {
+      async function deletarUsuario(id) {
         if (!confirm2("Remover usuário?")) return;
-        usuarios = usuarios.filter((u) => u.id !== id);
-        renderUsuarios();
+        try {
+          await api(`/usuarios/${id}`, { method: "DELETE" });
+          usuarios = usuarios.filter((u) => u.id !== id);
+          renderUsuarios();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
-      function novoAdmin() {
+      async function novoAdmin() {
         const nome = prompt("Nome do administrador:");
         if (!nome) return;
         const email = prompt("Email:") || "";
-        admins.push({
-          id: Date.now(),
-          nome,
-          email,
-          role: "Admin",
-          data: new Date().toLocaleDateString("pt-BR"),
-        });
-        renderUsuarios();
-        atualizarMetricas();
+        try {
+          const json = await api("/usuarios", {
+            method: "POST",
+            body: JSON.stringify({ nome, email, tipo: "admin" }),
+          });
+          admins.push(json.data);
+          renderUsuarios();
+          atualizarMetricas();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
-      function novoUsuario() {
+      async function novoUsuario() {
         const nome = prompt("Nome do usuário:");
         if (!nome) return;
         const email = prompt("Email:") || "";
-        usuarios.push({ id: Date.now(), nome, email });
-        renderUsuarios();
+        try {
+          const json = await api("/usuarios", {
+            method: "POST",
+            body: JSON.stringify({ nome, email, tipo: "comum" }),
+          });
+          usuarios.push(json.data);
+          renderUsuarios();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
       function adicionarFaturamento(id) {
         const u = usuarios.find((u) => u.id === id);
-        alert(
-          `Faturamento para: ${u.nome}\n(Implemente a lógica de faturamento aqui)`,
-        );
+        if (!u) return;
+        alert(`Faturamento para: ${u.nome}
+(Implementar integração)`);
       }
 
-      /* ==============================
-   FATURAMENTO
-============================== */
-      let selectedClient = null;
-
+      // ============================================
+      // FATURAMENTO
+      // ============================================
       function renderFaturamento() {
         const list = document.getElementById("fat-list");
+        if (!clientes.length) {
+          list.innerHTML =
+            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum cliente cadastrado.</p></div>';
+          lucide.createIcons();
+          return;
+        }
+
         list.innerHTML = clientes
           .map(
             (c) => `
@@ -1386,7 +1354,7 @@
       <div class="ci"><i data-lucide="dollar-sign"></i></div>
       <div style="flex:1;min-width:0">
         <div class="cname">${c.nome}</div>
-        <div class="cprice">R$\u00a0${c.preco}/${c.tipo}${c.tipo === "Mensal" ? ' &middot; <span class="badge badge-blue" style="font-size:0.65rem">Mensal</span>' : ""}</div>
+        <div class="cprice">R$ ${c.preco}/${c.tipo}${c.tipo === "Mensal" ? ' &middot; <span class="badge badge-blue" style="font-size:0.65rem">Mensal</span>' : ""}</div>
       </div>
       <div class="fat-client-actions">
         <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
@@ -1399,42 +1367,41 @@
 
         if (selectedClient) {
           const c = clientes.find((x) => x.id === selectedClient);
-          const pedidosCli = pedidos.filter((p) =>
-            p.cliente
-              .toLowerCase()
-              .includes(c.nome.split(" ")[0].toLowerCase()),
-          );
-          document.getElementById("fat-preview").innerHTML = `
-      <div style="margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px">
-        <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${c.nome}</div>
-        <div style="font-size:0.8rem;color:var(--gray-mid)">R$\u00a0${c.preco} / ${c.tipo}</div>
-      </div>
-      <div style="font-weight:600;font-size:0.85rem;margin-bottom:10px">Pedidos recentes</div>
-      ${
-        pedidosCli.length
-          ? pedidosCli
-              .slice(0, 5)
-              .map(
-                (p) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:0.82rem;font-weight:600">${p.protocolo}</div>
-            <div style="font-size:0.75rem;color:var(--gray-mid)">${p.placa} &middot; ${p.data}</div>
-          </div>
-          <span class="badge ${p.pago === "Pago" ? "badge-green" : "badge-red"}">${p.pago}</span>
+          if (c) {
+            const pedidosCli = pedidos.filter((p) =>
+              p.cliente
+                .toLowerCase()
+                .includes(c.nome.split(" ")[0].toLowerCase()),
+            );
+            document.getElementById("fat-preview").innerHTML = `
+        <div style="margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px">
+          <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${c.nome}</div>
+          <div style="font-size:0.8rem;color:var(--gray-mid)">R$ ${c.preco} / ${c.tipo}</div>
         </div>
-      `,
-              )
-              .join("")
-          : '<div style="color:var(--gray-mid);font-size:0.82rem">Nenhum pedido encontrado.</div>'
-      }
-    `;
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:10px">Pedidos recentes</div>
+        ${
+          pedidosCli.length
+            ? pedidosCli
+                .slice(0, 5)
+                .map(
+                  (p) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:0.82rem;font-weight:600">${p.protocolo}</div>
+              <div style="font-size:0.75rem;color:var(--gray-mid)">${p.placa} &middot; ${p.data}</div>
+            </div>
+            <span class="badge ${p.pago === "Pago" ? "badge-green" : "badge-red"}">${p.pago}</span>
+          </div>
+        `,
+                )
+                .join("")
+            : '<div style="color:var(--gray-mid);font-size:0.82rem">Nenhum pedido encontrado.</div>'
+        }
+      `;
+          }
         } else {
           document.getElementById("fat-preview").innerHTML = `
-      <div class="fat-empty">
-        <i data-lucide="file-text"></i>
-        <p>Selecione um cliente para ver a fatura</p>
-      </div>
+      <div class="fat-empty"><i data-lucide="file-text"></i><p>Selecione um cliente para ver a fatura</p></div>
     `;
         }
         lucide.createIcons();
@@ -1445,33 +1412,63 @@
         renderFaturamento();
       }
 
-      function editarCliente(id) {
+      async function editarCliente(id) {
         const c = clientes.find((x) => x.id === id);
+        if (!c) return;
         const preco = prompt(`Novo preço para ${c.nome}:`, c.preco);
-        if (preco) c.preco = preco;
-        renderFaturamento();
+        if (preco) {
+          try {
+            await api(`/clientes/${id}`, {
+              method: "PATCH",
+              body: JSON.stringify({ preco }),
+            });
+            c.preco = preco;
+            renderFaturamento();
+          } catch (err) {
+            alert("Erro: " + err.message);
+          }
+        }
       }
 
-      function deletarCliente(id) {
+      async function deletarCliente(id) {
         if (!confirm2("Remover cliente do faturamento?")) return;
-        clientes = clientes.filter((c) => c.id !== id);
-        if (selectedClient === id) selectedClient = null;
-        renderFaturamento();
+        try {
+          await api(`/clientes/${id}`, { method: "DELETE" });
+          clientes = clientes.filter((c) => c.id !== id);
+          if (selectedClient === id) selectedClient = null;
+          renderFaturamento();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
-      function novoCliente() {
+      async function novoCliente() {
         const nome = prompt("Nome do cliente:");
         if (!nome) return;
         const preco = prompt("Preço por consulta (ex: 42,20):") || "0,00";
         const tipo = prompt("Tipo (por consulta / Mensal):") || "por consulta";
-        clientes.push({ id: Date.now(), nome, preco, tipo });
-        renderFaturamento();
+        try {
+          const json = await api("/clientes", {
+            method: "POST",
+            body: JSON.stringify({ nome, preco, tipo }),
+          });
+          clientes.push(json.data);
+          renderFaturamento();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
       function filtrarClientes() {
         const q = document.getElementById("fat-search").value.toLowerCase();
         const list = document.getElementById("fat-list");
         const items = clientes.filter((c) => c.nome.toLowerCase().includes(q));
+        if (!items.length) {
+          list.innerHTML =
+            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum cliente encontrado.</p></div>';
+          lucide.createIcons();
+          return;
+        }
         list.innerHTML = items
           .map(
             (c) => `
@@ -1479,7 +1476,7 @@
       <div class="ci"><i data-lucide="dollar-sign"></i></div>
       <div style="flex:1;min-width:0">
         <div class="cname">${c.nome}</div>
-        <div class="cprice">R$\u00a0${c.preco}/${c.tipo}</div>
+        <div class="cprice">R$ ${c.preco}/${c.tipo}</div>
       </div>
       <div class="fat-client-actions">
         <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
@@ -1492,13 +1489,11 @@
         lucide.createIcons();
       }
 
-      /* ==============================
-   PAGAMENTOS
-============================== */
+      // ============================================
+      // PAGAMENTOS
+      // ============================================
       function renderPagamentos() {
         const filter = document.getElementById("pag-filter").value;
-
-        // summary
         const pagos = pedidos.filter((p) => p.pago === "Pago").length;
         const aguardando = pedidos.filter(
           (p) => p.pago === "Aguardando",
@@ -1518,7 +1513,6 @@
         let filtered = filter
           ? pedidos.filter((p) => p.pago === filter)
           : pedidos;
-
         const list = document.getElementById("pagamentos-list");
         if (!filtered.length) {
           list.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum registro.</p></div>`;
@@ -1530,9 +1524,7 @@
           .map(
             (p) => `
     <div class="list-card">
-      <div class="card-icon-wrap">
-        <i data-lucide="dollar-sign"></i>
-      </div>
+      <div class="card-icon-wrap"><i data-lucide="dollar-sign"></i></div>
       <div class="card-info">
         <div class="card-top">
           <span class="card-title">${p.protocolo}</span>
@@ -1557,23 +1549,37 @@
         lucide.createIcons();
       }
 
-      function mudarPagamento(id, valor) {
-        const p = pedidos.find((x) => x.id === id);
-        if (p) p.pago = valor;
-        renderPagamentos();
-        atualizarMetricas();
+      async function mudarPagamento(id, valor) {
+        try {
+          await api(`/pedidos/${id}/pagamento`, {
+            method: "PATCH",
+            body: JSON.stringify({ pago: valor }),
+          });
+          const p = pedidos.find((x) => x.id === id);
+          if (p) p.pago = valor;
+          renderPagamentos();
+          atualizarMetricas();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
-      /* ==============================
-   RELATÓRIOS
-============================== */
-      function renderRelatorio() {
+      // ============================================
+      // RELATÓRIOS
+      // ============================================
+      function renderRelatorio(data = [], totalGeral = null) {
         const tbody = document.getElementById("rel-tbody");
+        if (!data.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="4" class="empty-state"><i data-lucide="inbox"></i><p>Nenhum dado disponível.</p></td></tr>';
+          lucide.createIcons();
+          return;
+        }
+
         let totalQtd = 0,
           totalVal = 0;
-
         tbody.innerHTML =
-          relatorio
+          data
             .map((r) => {
               const tot = r.qtd * r.custo;
               totalQtd += r.qtd;
@@ -1588,15 +1594,29 @@
             .join("") +
           `<tr class="total-row">
     <td>Total Geral</td>
-    <td>${totalQtd}</td>
+    <td>${totalGeral?.qtd || totalQtd}</td>
     <td>—</td>
-    <td>R$ ${totalVal.toFixed(2).replace(".", ",")}</td>
+    <td>R$ ${(totalGeral?.valor || totalVal).toFixed(2).replace(".", ",")}</td>
   </tr>`;
       }
 
-      /* ==============================
-   TABS
-============================== */
+      // ============================================
+      // MÉTRICAS
+      // ============================================
+      function atualizarMetricas() {
+        document.getElementById("m-total").textContent = pedidos.length;
+        document.getElementById("m-pendentes").textContent = pedidos.filter(
+          (p) => p.status === "Pendente",
+        ).length;
+        document.getElementById("m-enviados").textContent = pedidos.filter(
+          (p) => p.status === "Enviado",
+        ).length;
+        document.getElementById("m-admins").textContent = admins.length;
+      }
+
+      // ============================================
+      // TABS
+      // ============================================
       document.querySelectorAll(".tab-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           document
@@ -1619,16 +1639,18 @@
         .getElementById("pedido-status")
         .addEventListener("change", renderPedidos);
 
-      /* ==============================
-   INIT
-============================== */
-      lucide.createIcons();
-      atualizarMetricas();
-      renderPedidos();
-      renderUsuarios();
-      renderFaturamento();
-      renderPagamentos();
-      renderRelatorio();
+      // ============================================
+      // INIT - CARREGA DADOS DA API
+      // ============================================
+      (async function init() {
+        lucide.createIcons();
+        await carregarPedidos();
+        await carregarUsuarios();
+        await carregarClientes();
+        await carregarRelatorio();
+        await carregarMetricas();
+        renderPagamentos();
+      })();
     </script>
   </body>
 </html>

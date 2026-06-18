@@ -28,6 +28,8 @@
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css" />
+    <base target="_blank" />
+    <base target="_blank" />
   </head>
   <body>
     <!-- ============================================================
@@ -41,129 +43,7 @@
           class="nav-logo"
           aria-label="LS Check — Verificação Técnica Veicular"
         >
-          <svg
-            class="logo-svg"
-            viewBox="0 0 260 70"
-            xmlns="http://www.w3.org/2000/svg"
-            role="img"
-          >
-            <!-- Escudo -->
-            <path
-              d="M6 4 L38 4 L38 38 Q38 54 22 62 Q6 54 6 38 Z"
-              fill="url(#shieldGrad)"
-            />
-            <!-- LS letters inside shield -->
-            <text
-              x="22"
-              y="42"
-              text-anchor="middle"
-              font-family="DM Sans,sans-serif"
-              font-weight="900"
-              font-size="22"
-              fill="white"
-              letter-spacing="-1"
-            >
-              LS
-            </text>
-            <!-- Gear partial ring -->
-            <g transform="translate(30,10)">
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                fill="none"
-                stroke="#393536"
-                stroke-width="2.5"
-                stroke-dasharray="44 20"
-                stroke-dashoffset="-4"
-              />
-              <circle
-                cx="12"
-                cy="12"
-                r="5.5"
-                fill="none"
-                stroke="#393536"
-                stroke-width="2"
-              />
-              <!-- gear teeth top arc -->
-              <rect
-                x="10"
-                y="0"
-                width="4"
-                height="4"
-                rx="1"
-                fill="#393536"
-                transform="rotate(0,12,12)"
-              />
-              <rect
-                x="10"
-                y="0"
-                width="4"
-                height="4"
-                rx="1"
-                fill="#393536"
-                transform="rotate(45,12,12)"
-              />
-              <rect
-                x="10"
-                y="0"
-                width="4"
-                height="4"
-                rx="1"
-                fill="#393536"
-                transform="rotate(90,12,12)"
-              />
-              <rect
-                x="10"
-                y="0"
-                width="4"
-                height="4"
-                rx="1"
-                fill="#393536"
-                transform="rotate(135,12,12)"
-              />
-            </g>
-            <!-- CHECK text -->
-            <text
-              x="72"
-              y="36"
-              font-family="DM Sans,sans-serif"
-              font-weight="900"
-              font-size="28"
-              fill="#2a2a29"
-              letter-spacing="1"
-            >
-              CHECK
-            </text>
-            <!-- underline -->
-            <line
-              x1="72"
-              y1="42"
-              x2="210"
-              y2="42"
-              stroke="#0453cc"
-              stroke-width="2"
-            />
-            <!-- subtitle -->
-            <text
-              x="72"
-              y="56"
-              font-family="DM Sans,sans-serif"
-              font-weight="500"
-              font-size="9"
-              fill="#393536"
-              letter-spacing="2.5"
-            >
-              VERIFICAÇÃO DE HISTÓRICO VEICULAR
-            </text>
-            <!-- gradient def -->
-            <defs>
-              <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#1565e0" />
-                <stop offset="100%" stop-color="#052288" />
-              </linearGradient>
-            </defs>
-          </svg>
+          <img src="logo-navbar.png" alt="LS Check" class="logo-img" />
         </a>
 
         <!-- Desktop Menu -->
@@ -177,18 +57,19 @@
             Serviços
           </a>
           <a
-            href="#como-funciona"
+            href="https://wa.me/5587996541760"
+            target="_blank"
             class="nav-link"
-            data-section="como-funciona"
+            data-section="contato"
           >
-            <i data-lucide="help-circle" style="width: 16px; height: 16px"></i>
-            Como Funciona
-          </a>
-          <a href="#faq" class="nav-link" data-section="faq">
             <i
               data-lucide="message-circle"
               style="width: 16px; height: 16px"
             ></i>
+            Fale Conosco
+          </a>
+          <a href="#faq" class="nav-link" data-section="faq">
+            <i data-lucide="help-circle" style="width: 16px; height: 16px"></i>
             FAQ
           </a>
         </nav>
@@ -196,15 +77,16 @@
         <!-- Desktop Actions -->
         <div class="nav-actions">
           <a
-            href="https://wa.me/559999999999?text=Já%20paguei%2C%20quero%20meu%20relatório."
+            href="https://wa.me/5587996541760?text=Já%20paguei%2C%20quero%20meu%20relatório."
             target="_blank"
             class="btn-outline"
           >
+            <i data-lucide="credit-card" style="width: 15px; height: 15px"></i>
             Já Paguei
           </a>
           <a href="#hero" class="btn-primary">
+            <i data-lucide="log-in" style="width: 15px; height: 15px"></i>
             Entrar
-            <i data-lucide="arrow-right" style="width: 15px; height: 15px"></i>
           </a>
         </div>
 
@@ -222,23 +104,24 @@
         <a href="#servicos" class="nav-link"
           ><i data-lucide="wrench"></i> Serviços</a
         >
-        <a href="#como-funciona" class="nav-link"
-          ><i data-lucide="help-circle"></i> Como Funciona</a
+        <a href="https://wa.me/5587996541760" target="_blank" class="nav-link"
+          ><i data-lucide="message-circle"></i> Fale Conosco</a
         >
         <a href="#faq" class="nav-link"
-          ><i data-lucide="message-circle"></i> FAQ</a
+          ><i data-lucide="help-circle"></i> FAQ</a
         >
         <div class="nav-actions">
           <a
-            href="https://wa.me/559999999999?text=Já%20paguei%2C%20quero%20meu%20relatório."
+            href="https://wa.me/5587996541760?text=Já%20paguei%2C%20quero%20meu%20relatório."
             target="_blank"
             class="btn-outline"
-            >Já Paguei</a
+            ><i data-lucide="credit-card" style="width: 14px; height: 14px"></i>
+            Já Paguei</a
           >
           <a href="#hero" class="btn-primary"
-            >Entrar
-            <i data-lucide="arrow-right" style="width: 14px; height: 14px"></i
-          ></a>
+            ><i data-lucide="log-in" style="width: 14px; height: 14px"></i>
+            Entrar</a
+          >
         </div>
       </nav>
     </header>
@@ -842,7 +725,7 @@
               "
             >
               Clique no botão "Já Paguei" no menu ou entre em contato pelo
-              WhatsApp (87) 9.9654-1760 enviando o comprovante.
+              WhatsApp (99) 9.9654-1760 enviando o comprovante.
             </div>
           </details>
         </div>
@@ -891,128 +774,13 @@
         <div class="footer-grid">
           <!-- Marca -->
           <div class="footer-brand">
-            <svg
-              class="logo-svg footer-logo-svg"
-              viewBox="0 0 260 70"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="LS Check"
-            >
-              <!-- Escudo -->
-              <path
-                d="M6 4 L38 4 L38 38 Q38 54 22 62 Q6 54 6 38 Z"
-                fill="url(#shieldGradF)"
-              />
-              <text
-                x="22"
-                y="42"
-                text-anchor="middle"
-                font-family="DM Sans,sans-serif"
-                font-weight="900"
-                font-size="22"
-                fill="white"
-                letter-spacing="-1"
-              >
-                LS
-              </text>
-              <!-- Gear -->
-              <g transform="translate(30,10)">
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  fill="none"
-                  stroke="#888"
-                  stroke-width="2.5"
-                  stroke-dasharray="44 20"
-                  stroke-dashoffset="-4"
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="5.5"
-                  fill="none"
-                  stroke="#888"
-                  stroke-width="2"
-                />
-                <rect
-                  x="10"
-                  y="0"
-                  width="4"
-                  height="4"
-                  rx="1"
-                  fill="#888"
-                  transform="rotate(0,12,12)"
-                />
-                <rect
-                  x="10"
-                  y="0"
-                  width="4"
-                  height="4"
-                  rx="1"
-                  fill="#888"
-                  transform="rotate(45,12,12)"
-                />
-                <rect
-                  x="10"
-                  y="0"
-                  width="4"
-                  height="4"
-                  rx="1"
-                  fill="#888"
-                  transform="rotate(90,12,12)"
-                />
-                <rect
-                  x="10"
-                  y="0"
-                  width="4"
-                  height="4"
-                  rx="1"
-                  fill="#888"
-                  transform="rotate(135,12,12)"
-                />
-              </g>
-              <!-- CHECK text white -->
-              <text
-                x="72"
-                y="36"
-                font-family="DM Sans,sans-serif"
-                font-weight="900"
-                font-size="28"
-                fill="white"
-                letter-spacing="1"
-              >
-                CHECK
-              </text>
-              <line
-                x1="72"
-                y1="42"
-                x2="210"
-                y2="42"
-                stroke="#0453cc"
-                stroke-width="2"
-              />
-              <text
-                x="72"
-                y="56"
-                font-family="DM Sans,sans-serif"
-                font-weight="500"
-                font-size="9"
-                fill="rgba(255,255,255,0.5)"
-                letter-spacing="2.5"
-              >
-                VERIFICAÇÃO DE HISTÓRICO VEICULAR
-              </text>
-              <defs>
-                <linearGradient id="shieldGradF" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#1565e0" />
-                  <stop offset="100%" stop-color="#052288" />
-                </linearGradient>
-              </defs>
-            </svg>
+            <img
+              src="logo-icon-footer.png"
+              alt="LS Check"
+              class="footer-logo-img"
+            />
             <p class="footer-tagline">
-              Consultas veiculares completas e confiáveis. Lincoln Santos
-              Engenharia Mecânica.
+              Consultas veiculares completas e confiáveis.
             </p>
           </div>
 
@@ -1024,14 +792,14 @@
               <li><a href="#servicos">Serviços</a></li>
               <li>
                 <a
-                  href="https://wa.me/5599999999999?text=Já%20paguei%2C%20quero%20meu%20relatório."
+                  href="https://wa.me/5587996541760?text=Já%20paguei%2C%20quero%20meu%20relatório."
                   target="_blank"
                   >Já Paguei</a
                 >
               </li>
               <li><a href="#faq">Perguntas Frequentes</a></li>
               <li>
-                <a href="https://wa.me/5599999999999" target="_blank"
+                <a href="https://wa.me/5587996541760" target="_blank"
                   >Fale Conosco</a
                 >
               </li>
@@ -1042,24 +810,18 @@
           <div class="footer-col">
             <h4>Contato</h4>
             <div class="footer-contact-item">
-              <i
-                data-lucide="message-circle"
-                style="width: 16px; height: 16px; color: #25d366"
-              ></i>
               <a
-                href="https://wa.me/5599999999999
-          "
+                href="https://wa.me/5587996541760"
                 target="_blank"
                 style="color: rgba(255, 255, 255, 0.5)"
-                >(87) 9.9654-1760</a
+                >WhatsApp: (87) 9.9654-1760</a
               >
             </div>
             <div class="footer-contact-item">
-              <i data-lucide="mail" style="width: 16px; height: 16px"></i>
               <a
-                href="mailto:aaa@outlook.com"
+                href="mailto:lincoleng2001@outlook.com"
                 style="color: rgba(255, 255, 255, 0.5)"
-                >aaaaaaaaaaaautlook.com</a
+                >lscheck@outlook.com.br</a
               >
             </div>
           </div>
