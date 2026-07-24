@@ -499,7 +499,7 @@
       // ============================================
       // CONFIG - BACKEND VAI PASSAR A URL REAL
       // ============================================
-      const API_URL = "https://api.lscheck.com.br"; // <-- TROCAR PELA URL DO BACKEND
+      const API_URL = "https://plataforma-consultas-backend-rqp0.onrender.com";
 
       // ============================================
       // UTILITÁRIOS
@@ -534,40 +534,27 @@
           return;
         }
 
-        // MODO DESENVOLVIMENTO: simula login sem backend
-        // REMOVER QUANDO BACKEND ESTIVER PRONTO
-        localStorage.setItem("token", "dev-token-temporario");
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ id: 1, nome: "Admin", role: "admin" }),
-        );
-        location.href = "admin.html";
+        try {
+          const res = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha }),
+          });
 
-        // QUANDO BACKEND ESTIVER PRONTO, USE:
-        /*
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha })
-    });
+          const json = await res.json();
 
-    const json = await res.json();
+          if (!res.ok || !json.token) {
+            alert(json.error || "Email ou senha incorretos");
+            return;
+          }
 
-    if (!res.ok || !json.token) {
-      alert(json.error || 'Email ou senha incorretos');
-      return;
-    }
-
-    localStorage.setItem('token', json.token);
-    localStorage.setItem('user', JSON.stringify(json.user));
-    location.href = 'admin.html';
-
-  } catch (err) {
-    alert('Erro ao conectar com o servidor. Tente novamente.');
-    console.error(err);
-  }
-  */
+          localStorage.setItem("token", json.token);
+          localStorage.setItem("user", JSON.stringify(json.user));
+          location.href = "admin.html";
+        } catch (err) {
+          alert("Erro ao conectar com o servidor. Tente novamente.");
+          console.error(err);
+        }
       }
 
       // ============================================
@@ -585,40 +572,27 @@
           return;
         }
 
-        // MODO DESENVOLVIMENTO: simula cadastro sem backend
-        // REMOVER QUANDO BACKEND ESTIVER PRONTO
-        localStorage.setItem("token", "dev-token-temporario");
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ id: 1, nome, role: "comum" }),
-        );
-        location.href = "admin.html";
+        try {
+          const res = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nome, email, cpf, telefone, senha }),
+          });
 
-        // QUANDO BACKEND ESTIVER PRONTO, USE:
-        /*
-  try {
-    const res = await fetch(`${API_URL}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, email, cpf, telefone, senha })
-    });
+          const json = await res.json();
 
-    const json = await res.json();
+          if (!res.ok) {
+            alert(json.error || "Erro no cadastro");
+            return;
+          }
 
-    if (!res.ok) {
-      alert(json.error || 'Erro no cadastro');
-      return;
-    }
-
-    localStorage.setItem('token', json.token);
-    localStorage.setItem('user', JSON.stringify(json.user));
-    location.href = 'admin.html';
-
-  } catch (err) {
-    alert('Erro ao conectar com o servidor. Tente novamente.');
-    console.error(err);
-  }
-  */
+          localStorage.setItem("token", json.token);
+          localStorage.setItem("user", JSON.stringify(json.user));
+          location.href = "admin.html";
+        } catch (err) {
+          alert("Erro ao conectar com o servidor. Tente novamente.");
+          console.error(err);
+        }
       }
 
       // ============================================

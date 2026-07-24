@@ -974,7 +974,7 @@
       // ============================================
       // CONFIG - BACKEND VAI PASSAR A URL REAL
       // ============================================
-      const API_URL = "https://api.lscheck.com.br"; // <-- TROCAR PELA URL DO BACKEND
+      const API_URL = "https://plataforma-consultas-backend-rqp0.onrender.com";
 
       // ============================================
       // PROTEÇÃO: verifica se está logado
@@ -1040,7 +1040,7 @@
       // ============================================
       async function carregarPedidos() {
         try {
-          const json = await api("/pedidos");
+          const json = await api("/api/orders/admin/all");
           pedidos = json.data || [];
           renderPedidos();
           atualizarMetricas();
@@ -1081,22 +1081,15 @@
           lucide.createIcons();
         }
       }
-
       async function carregarRelatorio() {
-        try {
-          const json = await api("/relatorios");
-          renderRelatorio(json.data || [], json.totalGeral);
-        } catch (err) {
-          console.error("Erro ao carregar relatório:", err);
-          document.getElementById("rel-tbody").innerHTML =
-            '<tr><td colspan="4" class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></td></tr>';
-          lucide.createIcons();
-        }
+        document.getElementById("rel-tbody").innerHTML =
+          '<tr><td colspan="4" class="empty-state"><i data-lucide="clock"></i><p>Relatórios em breve</p></td></tr>';
+        lucide.createIcons();
       }
 
       async function carregarMetricas() {
         try {
-          const json = await api("/metricas");
+          const json = await api("/api/orders/admin/metrics");
           document.getElementById("m-total").textContent =
             json.totalPedidos || 0;
           document.getElementById("m-pendentes").textContent =
@@ -1177,7 +1170,7 @@
       async function deletarPedido(id) {
         if (!confirm2("Excluir este pedido?")) return;
         try {
-          await api(`/pedidos/${id}`, { method: "DELETE" });
+          await api(`/api/orders/admin/${id}`, { method: "DELETE" });
           pedidos = pedidos.filter((p) => p.id !== id);
           renderPedidos();
           atualizarMetricas();
@@ -1193,7 +1186,7 @@
         const cliente = prompt("Cliente:") || "";
 
         try {
-          const json = await api("/pedidos", {
+          const json = await api("/api/orders/", {
             method: "POST",
             body: JSON.stringify({
               protocolo,
@@ -1551,7 +1544,7 @@
 
       async function mudarPagamento(id, valor) {
         try {
-          await api(`/pedidos/${id}/pagamento`, {
+          await api(`/api/orders/admin/${id}/confirm-payment`, {
             method: "PATCH",
             body: JSON.stringify({ pago: valor }),
           });
