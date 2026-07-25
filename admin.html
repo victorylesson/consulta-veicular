@@ -825,13 +825,16 @@
             <input type="date" class="date-input" title="Data fim" />
             <select class="filter-select" id="pedido-status">
               <option value="">Todos Status</option>
-              <option value="Enviado">Enviado</option>
-              <option value="Pendente">Pendente</option>
-              <option value="Cancelado">Cancelado</option>
+              <option value="pending_review">Aguardando revisão</option>
+              <option value="queries_runnig">Consultando</option>
+              <option value="queries_done">Consultas concluídas</option>
+              <option value="pending_payment">Aguardando pagamento</option>
+              <option value="processing">Processando</option>
+              <option value="pdf_review">Aguardando PDF</option>
+              <option value="completed">Concluído</option>
+              <option value="rejected">Rejeitado</option>
+              <option value="failed">Falhou</option>
             </select>
-            <button class="btn-primary" onclick="novoPedido()">
-              <i data-lucide="plus"></i> Novo Pedido
-            </button>
           </div>
           <div id="pedidos-list">
             <div class="empty-state">
@@ -847,9 +850,6 @@
             <div class="section-title">
               <i data-lucide="shield-check"></i> Administradores
             </div>
-            <button class="btn-primary" onclick="novoAdmin()">
-              <i data-lucide="user-plus"></i> Novo Admin
-            </button>
           </div>
           <div id="admins-list">
             <div class="empty-state">
@@ -862,9 +862,6 @@
             <div class="section-title">
               <i data-lucide="user"></i> Usuários Comuns
             </div>
-            <button class="btn-secondary" onclick="novoUsuario()">
-              <i data-lucide="user-plus"></i> Novo Usuário
-            </button>
           </div>
           <div id="usuarios-list">
             <div class="empty-state">
@@ -876,59 +873,17 @@
 
         <!-- ABA FATURAMENTO -->
         <div class="tab-panel" id="tab-faturamento">
-          <div class="fat-layout">
-            <div class="fat-sidebar">
-              <div class="toolbar" style="margin-bottom: 0">
-                <div class="search-wrap" style="flex: 1">
-                  <i data-lucide="search"></i>
-                  <input
-                    type="text"
-                    id="fat-search"
-                    placeholder="Buscar cliente..."
-                    oninput="filtrarClientes()"
-                  />
-                </div>
-                <button class="btn-primary" onclick="novoCliente()">
-                  <i data-lucide="user-plus"></i> Novo
-                </button>
-              </div>
-              <div class="fat-list" id="fat-list">
-                <div class="empty-state">
-                  <i data-lucide="inbox"></i>
-                  <p>Carregando...</p>
-                </div>
-              </div>
-            </div>
-            <div class="fat-preview" id="fat-preview">
-              <div class="fat-empty">
-                <i data-lucide="file-text"></i>
-                <p>Selecione um cliente para ver a fatura</p>
-              </div>
-            </div>
+          <div class="empty-state">
+            <i data-lucide="clock"></i>
+            <p>Faturamento em breve</p>
           </div>
         </div>
 
         <!-- ABA PAGAMENTOS -->
         <div class="tab-panel" id="tab-pagamentos">
-          <div class="toolbar" style="margin-bottom: 14px">
-            <select
-              class="filter-select"
-              id="pag-filter"
-              onchange="renderPagamentos()"
-            >
-              <option value="">Todos Pagamentos</option>
-              <option value="Pago">Pagos</option>
-              <option value="Aguardando">Aguardando</option>
-              <option value="Reembolsado">Reembolsados</option>
-              <option value="Não Pago">Não Pagos</option>
-            </select>
-          </div>
-          <div class="pag-summary" id="pag-summary"></div>
-          <div id="pagamentos-list">
-            <div class="empty-state">
-              <i data-lucide="inbox"></i>
-              <p>Carregando...</p>
-            </div>
+          <div class="empty-state">
+            <i data-lucide="clock"></i>
+            <p>Pagamentos em breve</p>
           </div>
         </div>
 
@@ -959,8 +914,8 @@
               <tbody id="rel-tbody">
                 <tr>
                   <td colspan="4" class="empty-state">
-                    <i data-lucide="inbox"></i>
-                    <p>Carregando...</p>
+                    <i data-lucide="clock"></i>
+                    <p>Relatórios em breve</p>
                   </td>
                 </tr>
               </tbody>
@@ -972,7 +927,7 @@
 
     <script>
       // ============================================
-      // CONFIG - BACKEND VAI PASSAR A URL REAL
+      // CONFIG - URL DO BACKEND
       // ============================================
       const API_URL = "https://plataforma-consultas-backend-rqp0.onrender.com";
 
@@ -1027,13 +982,42 @@
       }
 
       // ============================================
-      // DADOS (vindos da API - inicialmente vazios)
+      // DADOS (vindos da API)
       // ============================================
       let pedidos = [];
       let admins = [];
       let usuarios = [];
-      let clientes = [];
-      let selectedClient = null;
+
+      // ============================================
+      // MAPA DE STATUS (bate com o enum real do backend)
+      // ============================================
+      const STATUS_LABELS = {
+        pending_review: "Aguardando revisão",
+        queries_runnig: "Consultando",
+        queries_done: "Consultas concluídas",
+        pending_payment: "Aguardando pagamento",
+        processing: "Processando",
+        pdf_review: "Aguardando PDF",
+        completed: "Concluído",
+        rejected: "Rejeitado",
+        failed: "Falhou",
+      };
+
+      const STATUS_BADGE = {
+        pending_review: "badge-yellow",
+        queries_runnig: "badge-blue",
+        queries_done: "badge-blue",
+        pending_payment: "badge-yellow",
+        processing: "badge-blue",
+        pdf_review: "badge-yellow",
+        completed: "badge-green",
+        rejected: "badge-red",
+        failed: "badge-red",
+      };
+
+      function confirm2(msg) {
+        return confirm(msg);
+      }
 
       // ============================================
       // CARREGAMENTO DE DADOS DA API
@@ -1041,9 +1025,8 @@
       async function carregarPedidos() {
         try {
           const json = await api("/api/orders/admin/all");
-          pedidos = json.data || [];
+          pedidos = json.data?.orders || [];
           renderPedidos();
-          atualizarMetricas();
         } catch (err) {
           console.error("Erro ao carregar pedidos:", err);
           document.getElementById("pedidos-list").innerHTML =
@@ -1058,7 +1041,6 @@
           admins = json.data?.admins || [];
           usuarios = json.data?.usuarios || [];
           renderUsuarios();
-          atualizarMetricas();
         } catch (err) {
           console.error("Erro ao carregar usuários:", err);
           document.getElementById("admins-list").innerHTML =
@@ -1069,47 +1051,17 @@
         }
       }
 
-      async function carregarClientes() {
-        try {
-          const json = await api("/clientes");
-          clientes = json.data || [];
-          renderFaturamento();
-        } catch (err) {
-          console.error("Erro ao carregar clientes:", err);
-          document.getElementById("fat-list").innerHTML =
-            '<div class="empty-state"><i data-lucide="alert-circle"></i><p>Erro ao carregar</p></div>';
-          lucide.createIcons();
-        }
-      }
-      async function carregarRelatorio() {
-        document.getElementById("rel-tbody").innerHTML =
-          '<tr><td colspan="4" class="empty-state"><i data-lucide="clock"></i><p>Relatórios em breve</p></td></tr>';
-        lucide.createIcons();
-      }
-
       async function carregarMetricas() {
         try {
           const json = await api("/api/orders/admin/metrics");
-          document.getElementById("m-total").textContent =
-            json.totalPedidos || 0;
-          document.getElementById("m-pendentes").textContent =
-            json.pendentes || 0;
-          document.getElementById("m-enviados").textContent =
-            json.enviados || 0;
-          document.getElementById("m-admins").textContent = json.admins || 0;
+          const m = json.data || {};
+          document.getElementById("m-total").textContent = m.totalPedidos || 0;
+          document.getElementById("m-pendentes").textContent = m.pendentes || 0;
+          document.getElementById("m-enviados").textContent = m.enviados || 0;
+          document.getElementById("m-admins").textContent = m.admins || 0;
         } catch (err) {
           console.error("Erro ao carregar métricas:", err);
         }
-      }
-
-      // ============================================
-      // UTILITÁRIOS
-      // ============================================
-      function fmt(v) {
-        return `R$ ${v}`;
-      }
-      function confirm2(msg) {
-        return confirm(msg);
       }
 
       // ============================================
@@ -1123,11 +1075,11 @@
         const list = document.getElementById("pedidos-list");
 
         let filtered = pedidos.filter((p) => {
+          const nomeCliente = p.userId?.name || "";
           const matchSearch =
             !search ||
-            p.protocolo.toLowerCase().includes(search) ||
-            p.cliente.toLowerCase().includes(search) ||
-            p.placa.toLowerCase().includes(search);
+            p.placa?.toLowerCase().includes(search) ||
+            nomeCliente.toLowerCase().includes(search);
           const matchStatus = !status || p.status === status;
           return matchSearch && matchStatus;
         });
@@ -1139,69 +1091,136 @@
         }
 
         list.innerHTML = filtered
-          .map(
-            (p) => `
-    <div class="list-card" id="pedido-${p.id}">
-      <div class="card-icon-wrap green-icon"><i data-lucide="check-circle-2"></i></div>
+          .map((p) => {
+            const nomeCliente = p.userId?.name || "Cliente";
+            const tipo =
+              p.orderType === "report" ? p.reportType || "Relatório" : "Avulso";
+            const data = p.createdAt
+              ? new Date(p.createdAt).toLocaleDateString("pt-BR")
+              : "";
+
+            return `
+    <div class="list-card" id="pedido-${p._id}">
+      <div class="card-icon-wrap green-icon"><i data-lucide="file-text"></i></div>
       <div class="card-info">
         <div class="card-top">
-          <span class="card-title">${p.protocolo}</span>
-          <span class="badge ${p.status === "Enviado" ? "badge-blue" : "badge-yellow"}">${p.status}</span>
-          <span class="badge ${p.pago === "Pago" ? "badge-green" : p.pago === "Aguardando" ? "badge-yellow" : "badge-red"}">${p.pago}</span>
+          <span class="card-title">${p.placa}</span>
+          <span class="badge ${STATUS_BADGE[p.status] || "badge-gray"}">${STATUS_LABELS[p.status] || p.status}</span>
         </div>
-        <div class="card-sub">${p.cliente} &middot; ${p.placa}</div>
+        <div class="card-sub">${nomeCliente} &middot; ${tipo}</div>
       </div>
       <div class="card-right">
-        <span class="card-date">${p.data}</span>
+        <span class="card-date">${data}</span>
         <div class="action-btns">
-          <button class="action-btn danger" title="Excluir" onclick="deletarPedido(${p.id})"><i data-lucide="trash-2"></i></button>
-          <button class="action-btn" title="Comentar"><i data-lucide="message-circle"></i></button>
-          <button class="action-btn" title="Abrir externo"><i data-lucide="external-link"></i></button>
-          <button class="action-btn" title="Visualizar"><i data-lucide="eye"></i></button>
+          ${acoesPedido(p)}
+          <button class="action-btn danger" title="Excluir" onclick="deletarPedido('${p._id}')"><i data-lucide="trash-2"></i></button>
         </div>
       </div>
     </div>
-  `,
-          )
+  `;
+          })
           .join("");
         lucide.createIcons();
+      }
+
+      // Botões de ação de acordo com o estágio do pedido (fluxo real do backend)
+      function acoesPedido(p) {
+        switch (p.status) {
+          case "pending_review":
+            return `
+        <button class="action-btn" title="Rodar consultas" onclick="rodarConsultas('${p._id}')"><i data-lucide="play"></i></button>
+        <button class="action-btn danger" title="Rejeitar" onclick="rejeitarPedido('${p._id}')"><i data-lucide="x"></i></button>
+      `;
+          case "queries_done":
+            return `
+        <button class="action-btn" title="Aprovar para pagamento" onclick="aprovarPedido('${p._id}')"><i data-lucide="check"></i></button>
+        <button class="action-btn" title="Retentar falhas" onclick="retentarFalhas('${p._id}')"><i data-lucide="refresh-cw"></i></button>
+      `;
+          case "pending_payment":
+            return `<button class="action-btn" title="Confirmar pagamento" onclick="confirmarPagamento('${p._id}')"><i data-lucide="dollar-sign"></i></button>`;
+          case "pdf_review":
+            return `<button class="action-btn" title="Gerar PDF" onclick="gerarPdf('${p._id}')"><i data-lucide="file-down"></i></button>`;
+          case "failed":
+            return `<button class="action-btn" title="Retentar falhas" onclick="retentarFalhas('${p._id}')"><i data-lucide="refresh-cw"></i></button>`;
+          default:
+            return "";
+        }
+      }
+
+      async function rodarConsultas(id) {
+        try {
+          await api(`/api/orders/admin/${id}/run-queries`, { method: "POST" });
+          alert("Consultas disparadas. Atualizando em instantes...");
+          setTimeout(carregarPedidos, 4000);
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function rejeitarPedido(id) {
+        const motivo = prompt("Motivo da rejeição (opcional):") || undefined;
+        try {
+          await api(`/api/orders/admin/${id}/review`, {
+            method: "PATCH",
+            body: JSON.stringify({ approved: false, rejectionReason: motivo }),
+          });
+          await carregarPedidos();
+          await carregarMetricas();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function aprovarPedido(id) {
+        try {
+          await api(`/api/orders/admin/${id}/approve`, { method: "PATCH" });
+          await carregarPedidos();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function retentarFalhas(id) {
+        try {
+          await api(`/api/orders/admin/${id}/retry-failed`, { method: "POST" });
+          alert("Reprocessando falhas. Atualizando em instantes...");
+          setTimeout(carregarPedidos, 4000);
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function confirmarPagamento(id) {
+        if (!confirm2("Confirmar pagamento deste pedido?")) return;
+        try {
+          await api(`/api/orders/admin/${id}/confirm-payment`, {
+            method: "PATCH",
+          });
+          await carregarPedidos();
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
+      }
+
+      async function gerarPdf(id) {
+        try {
+          await api(`/api/orders/admin/${id}/generate-pdf`, { method: "POST" });
+          alert("Gerando PDF. Atualizando em instantes...");
+          setTimeout(carregarPedidos, 4000);
+        } catch (err) {
+          alert("Erro: " + err.message);
+        }
       }
 
       async function deletarPedido(id) {
         if (!confirm2("Excluir este pedido?")) return;
         try {
           await api(`/api/orders/admin/${id}`, { method: "DELETE" });
-          pedidos = pedidos.filter((p) => p.id !== id);
+          pedidos = pedidos.filter((p) => p._id !== id);
           renderPedidos();
-          atualizarMetricas();
+          await carregarMetricas();
         } catch (err) {
           alert("Erro ao excluir: " + err.message);
-        }
-      }
-
-      async function novoPedido() {
-        const protocolo = prompt("Protocolo do novo pedido:");
-        if (!protocolo) return;
-        const placa = prompt("Placa:") || "";
-        const cliente = prompt("Cliente:") || "";
-
-        try {
-          const json = await api("/api/orders/", {
-            method: "POST",
-            body: JSON.stringify({
-              protocolo,
-              placa,
-              cliente,
-              status: "Pendente",
-              pago: "Não Pago",
-              tipo: "Consulta Veicular Completa",
-            }),
-          });
-          pedidos.unshift(json.data);
-          renderPedidos();
-          atualizarMetricas();
-        } catch (err) {
-          alert("Erro ao criar: " + err.message);
         }
       }
 
@@ -1217,17 +1236,15 @@
           al.innerHTML = admins
             .map(
               (a) => `
-      <div class="list-card" id="admin-${a.id}">
+      <div class="list-card" id="admin-${a._id}">
         <div class="card-icon-wrap"><i data-lucide="shield"></i></div>
         <div class="card-info">
-          <div class="card-top"><span class="card-title">${a.nome}</span><span class="badge badge-gray">${a.role}</span></div>
+          <div class="card-top"><span class="card-title">${a.name}</span><span class="badge badge-gray">${a.role}</span></div>
           <div class="card-sub">${a.email}</div>
         </div>
         <div class="card-right">
-          <span class="card-date">${a.data}</span>
           <div class="action-btns">
-            <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
-            <button class="action-btn danger" title="Excluir" onclick="deletarAdmin(${a.id})"><i data-lucide="trash-2"></i></button>
+            <button class="action-btn danger" title="Excluir" onclick="deletarUsuario('${a._id}')"><i data-lucide="trash-2"></i></button>
           </div>
         </div>
       </div>
@@ -1244,17 +1261,15 @@
           ul.innerHTML = usuarios
             .map(
               (u) => `
-      <div class="list-card" id="user-${u.id}">
+      <div class="list-card" id="user-${u._id}">
         <div class="card-icon-wrap"><i data-lucide="user"></i></div>
         <div class="card-info">
-          <div class="card-top"><span class="card-title">${u.nome}</span></div>
+          <div class="card-top"><span class="card-title">${u.name}</span></div>
           <div class="card-sub">${u.email}</div>
         </div>
         <div class="card-right">
-          <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem" onclick="adicionarFaturamento(${u.id})"><i data-lucide="plus"></i> Faturamento</button>
           <div class="action-btns">
-            <button class="action-btn" title="Editar"><i data-lucide="pencil"></i></button>
-            <button class="action-btn danger" title="Excluir" onclick="deletarUsuario(${u.id})"><i data-lucide="trash-2"></i></button>
+            <button class="action-btn danger" title="Excluir" onclick="deletarUsuario('${u._id}')"><i data-lucide="trash-2"></i></button>
           </div>
         </div>
       </div>
@@ -1265,346 +1280,18 @@
         lucide.createIcons();
       }
 
-      async function deletarAdmin(id) {
-        if (!confirm2("Remover administrador?")) return;
-        try {
-          await api(`/usuarios/${id}`, { method: "DELETE" });
-          admins = admins.filter((a) => a.id !== id);
-          renderUsuarios();
-          atualizarMetricas();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
+      // Um só endpoint de exclusão pra admin e usuário comum (DELETE /usuarios/:id)
       async function deletarUsuario(id) {
-        if (!confirm2("Remover usuário?")) return;
+        if (!confirm2("Remover este usuário?")) return;
         try {
           await api(`/usuarios/${id}`, { method: "DELETE" });
-          usuarios = usuarios.filter((u) => u.id !== id);
+          admins = admins.filter((a) => a._id !== id);
+          usuarios = usuarios.filter((u) => u._id !== id);
           renderUsuarios();
+          await carregarMetricas();
         } catch (err) {
           alert("Erro: " + err.message);
         }
-      }
-
-      async function novoAdmin() {
-        const nome = prompt("Nome do administrador:");
-        if (!nome) return;
-        const email = prompt("Email:") || "";
-        try {
-          const json = await api("/usuarios", {
-            method: "POST",
-            body: JSON.stringify({ nome, email, tipo: "admin" }),
-          });
-          admins.push(json.data);
-          renderUsuarios();
-          atualizarMetricas();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
-      async function novoUsuario() {
-        const nome = prompt("Nome do usuário:");
-        if (!nome) return;
-        const email = prompt("Email:") || "";
-        try {
-          const json = await api("/usuarios", {
-            method: "POST",
-            body: JSON.stringify({ nome, email, tipo: "comum" }),
-          });
-          usuarios.push(json.data);
-          renderUsuarios();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
-      function adicionarFaturamento(id) {
-        const u = usuarios.find((u) => u.id === id);
-        if (!u) return;
-        alert(`Faturamento para: ${u.nome}
-(Implementar integração)`);
-      }
-
-      // ============================================
-      // FATURAMENTO
-      // ============================================
-      function renderFaturamento() {
-        const list = document.getElementById("fat-list");
-        if (!clientes.length) {
-          list.innerHTML =
-            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum cliente cadastrado.</p></div>';
-          lucide.createIcons();
-          return;
-        }
-
-        list.innerHTML = clientes
-          .map(
-            (c) => `
-    <div class="fat-client ${selectedClient === c.id ? "selected" : ""}" onclick="selecionarCliente(${c.id})">
-      <div class="ci"><i data-lucide="dollar-sign"></i></div>
-      <div style="flex:1;min-width:0">
-        <div class="cname">${c.nome}</div>
-        <div class="cprice">R$ ${c.preco}/${c.tipo}${c.tipo === "Mensal" ? ' &middot; <span class="badge badge-blue" style="font-size:0.65rem">Mensal</span>' : ""}</div>
-      </div>
-      <div class="fat-client-actions">
-        <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
-        <button class="action-btn danger" title="Excluir" onclick="event.stopPropagation();deletarCliente(${c.id})"><i data-lucide="trash-2"></i></button>
-      </div>
-    </div>
-  `,
-          )
-          .join("");
-
-        if (selectedClient) {
-          const c = clientes.find((x) => x.id === selectedClient);
-          if (c) {
-            const pedidosCli = pedidos.filter((p) =>
-              p.cliente
-                .toLowerCase()
-                .includes(c.nome.split(" ")[0].toLowerCase()),
-            );
-            document.getElementById("fat-preview").innerHTML = `
-        <div style="margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px">
-          <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${c.nome}</div>
-          <div style="font-size:0.8rem;color:var(--gray-mid)">R$ ${c.preco} / ${c.tipo}</div>
-        </div>
-        <div style="font-weight:600;font-size:0.85rem;margin-bottom:10px">Pedidos recentes</div>
-        ${
-          pedidosCli.length
-            ? pedidosCli
-                .slice(0, 5)
-                .map(
-                  (p) => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-            <div>
-              <div style="font-size:0.82rem;font-weight:600">${p.protocolo}</div>
-              <div style="font-size:0.75rem;color:var(--gray-mid)">${p.placa} &middot; ${p.data}</div>
-            </div>
-            <span class="badge ${p.pago === "Pago" ? "badge-green" : "badge-red"}">${p.pago}</span>
-          </div>
-        `,
-                )
-                .join("")
-            : '<div style="color:var(--gray-mid);font-size:0.82rem">Nenhum pedido encontrado.</div>'
-        }
-      `;
-          }
-        } else {
-          document.getElementById("fat-preview").innerHTML = `
-      <div class="fat-empty"><i data-lucide="file-text"></i><p>Selecione um cliente para ver a fatura</p></div>
-    `;
-        }
-        lucide.createIcons();
-      }
-
-      function selecionarCliente(id) {
-        selectedClient = selectedClient === id ? null : id;
-        renderFaturamento();
-      }
-
-      async function editarCliente(id) {
-        const c = clientes.find((x) => x.id === id);
-        if (!c) return;
-        const preco = prompt(`Novo preço para ${c.nome}:`, c.preco);
-        if (preco) {
-          try {
-            await api(`/clientes/${id}`, {
-              method: "PATCH",
-              body: JSON.stringify({ preco }),
-            });
-            c.preco = preco;
-            renderFaturamento();
-          } catch (err) {
-            alert("Erro: " + err.message);
-          }
-        }
-      }
-
-      async function deletarCliente(id) {
-        if (!confirm2("Remover cliente do faturamento?")) return;
-        try {
-          await api(`/clientes/${id}`, { method: "DELETE" });
-          clientes = clientes.filter((c) => c.id !== id);
-          if (selectedClient === id) selectedClient = null;
-          renderFaturamento();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
-      async function novoCliente() {
-        const nome = prompt("Nome do cliente:");
-        if (!nome) return;
-        const preco = prompt("Preço por consulta (ex: 42,20):") || "0,00";
-        const tipo = prompt("Tipo (por consulta / Mensal):") || "por consulta";
-        try {
-          const json = await api("/clientes", {
-            method: "POST",
-            body: JSON.stringify({ nome, preco, tipo }),
-          });
-          clientes.push(json.data);
-          renderFaturamento();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
-      function filtrarClientes() {
-        const q = document.getElementById("fat-search").value.toLowerCase();
-        const list = document.getElementById("fat-list");
-        const items = clientes.filter((c) => c.nome.toLowerCase().includes(q));
-        if (!items.length) {
-          list.innerHTML =
-            '<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum cliente encontrado.</p></div>';
-          lucide.createIcons();
-          return;
-        }
-        list.innerHTML = items
-          .map(
-            (c) => `
-    <div class="fat-client ${selectedClient === c.id ? "selected" : ""}" onclick="selecionarCliente(${c.id})">
-      <div class="ci"><i data-lucide="dollar-sign"></i></div>
-      <div style="flex:1;min-width:0">
-        <div class="cname">${c.nome}</div>
-        <div class="cprice">R$ ${c.preco}/${c.tipo}</div>
-      </div>
-      <div class="fat-client-actions">
-        <button class="action-btn" title="Editar" onclick="event.stopPropagation();editarCliente(${c.id})"><i data-lucide="pencil"></i></button>
-        <button class="action-btn danger" title="Excluir" onclick="event.stopPropagation();deletarCliente(${c.id})"><i data-lucide="trash-2"></i></button>
-      </div>
-    </div>
-  `,
-          )
-          .join("");
-        lucide.createIcons();
-      }
-
-      // ============================================
-      // PAGAMENTOS
-      // ============================================
-      function renderPagamentos() {
-        const filter = document.getElementById("pag-filter").value;
-        const pagos = pedidos.filter((p) => p.pago === "Pago").length;
-        const aguardando = pedidos.filter(
-          (p) => p.pago === "Aguardando",
-        ).length;
-        const reembolsado = pedidos.filter(
-          (p) => p.pago === "Reembolsado",
-        ).length;
-        const naoPago = pedidos.filter((p) => p.pago === "Não Pago").length;
-
-        document.getElementById("pag-summary").innerHTML = `
-    <div class="pag-card green"><div class="pag-label">Pagos</div><div class="pag-value">${pagos}</div></div>
-    <div class="pag-card yellow"><div class="pag-label">Aguardando</div><div class="pag-value">${aguardando}</div></div>
-    <div class="pag-card red"><div class="pag-label">Reembolsados</div><div class="pag-value">${reembolsado}</div></div>
-    <div class="pag-card black"><div class="pag-label">Não Pagos</div><div class="pag-value">${naoPago}</div></div>
-  `;
-
-        let filtered = filter
-          ? pedidos.filter((p) => p.pago === filter)
-          : pedidos;
-        const list = document.getElementById("pagamentos-list");
-        if (!filtered.length) {
-          list.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><p>Nenhum registro.</p></div>`;
-          lucide.createIcons();
-          return;
-        }
-
-        list.innerHTML = filtered
-          .map(
-            (p) => `
-    <div class="list-card">
-      <div class="card-icon-wrap"><i data-lucide="dollar-sign"></i></div>
-      <div class="card-info">
-        <div class="card-top">
-          <span class="card-title">${p.protocolo}</span>
-          <span class="badge ${p.pago === "Pago" ? "badge-green" : p.pago === "Aguardando" ? "badge-yellow" : "badge-red"}" id="badge-pag-${p.id}">${p.pago}</span>
-          <span class="badge ${p.status === "Enviado" ? "badge-blue" : "badge-yellow"}">${p.status}</span>
-        </div>
-        <div class="card-sub">${p.cliente} &middot; ${p.placa} &middot; ${p.tipo}</div>
-      </div>
-      <div class="card-right">
-        <span class="card-date">${p.data}</span>
-        <select class="pag-status-select" onchange="mudarPagamento(${p.id}, this.value)">
-          <option ${p.pago === "Não Pago" ? "selected" : ""}>Não Pago</option>
-          <option ${p.pago === "Aguardando" ? "selected" : ""}>Aguardando</option>
-          <option ${p.pago === "Pago" ? "selected" : ""}>Pago</option>
-          <option ${p.pago === "Reembolsado" ? "selected" : ""}>Reembolsado</option>
-        </select>
-      </div>
-    </div>
-  `,
-          )
-          .join("");
-        lucide.createIcons();
-      }
-
-      async function mudarPagamento(id, valor) {
-        try {
-          await api(`/api/orders/admin/${id}/confirm-payment`, {
-            method: "PATCH",
-            body: JSON.stringify({ pago: valor }),
-          });
-          const p = pedidos.find((x) => x.id === id);
-          if (p) p.pago = valor;
-          renderPagamentos();
-          atualizarMetricas();
-        } catch (err) {
-          alert("Erro: " + err.message);
-        }
-      }
-
-      // ============================================
-      // RELATÓRIOS
-      // ============================================
-      function renderRelatorio(data = [], totalGeral = null) {
-        const tbody = document.getElementById("rel-tbody");
-        if (!data.length) {
-          tbody.innerHTML =
-            '<tr><td colspan="4" class="empty-state"><i data-lucide="inbox"></i><p>Nenhum dado disponível.</p></td></tr>';
-          lucide.createIcons();
-          return;
-        }
-
-        let totalQtd = 0,
-          totalVal = 0;
-        tbody.innerHTML =
-          data
-            .map((r) => {
-              const tot = r.qtd * r.custo;
-              totalQtd += r.qtd;
-              totalVal += tot;
-              return `<tr>
-      <td>${r.tipo}</td>
-      <td>${r.qtd}</td>
-      <td>R$ ${r.custo.toFixed(2).replace(".", ",")}</td>
-      <td>R$ ${tot.toFixed(2).replace(".", ",")}</td>
-    </tr>`;
-            })
-            .join("") +
-          `<tr class="total-row">
-    <td>Total Geral</td>
-    <td>${totalGeral?.qtd || totalQtd}</td>
-    <td>—</td>
-    <td>R$ ${(totalGeral?.valor || totalVal).toFixed(2).replace(".", ",")}</td>
-  </tr>`;
-      }
-
-      // ============================================
-      // MÉTRICAS
-      // ============================================
-      function atualizarMetricas() {
-        document.getElementById("m-total").textContent = pedidos.length;
-        document.getElementById("m-pendentes").textContent = pedidos.filter(
-          (p) => p.status === "Pendente",
-        ).length;
-        document.getElementById("m-enviados").textContent = pedidos.filter(
-          (p) => p.status === "Enviado",
-        ).length;
-        document.getElementById("m-admins").textContent = admins.length;
       }
 
       // ============================================
@@ -1633,16 +1320,13 @@
         .addEventListener("change", renderPedidos);
 
       // ============================================
-      // INIT - CARREGA DADOS DA API
+      // INIT
       // ============================================
       (async function init() {
         lucide.createIcons();
         await carregarPedidos();
         await carregarUsuarios();
-        await carregarClientes();
-        await carregarRelatorio();
         await carregarMetricas();
-        renderPagamentos();
       })();
     </script>
   </body>
